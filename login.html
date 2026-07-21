@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Portal - LankaJobs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        
+        /* Custom Scrollbar for dashboard */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Circular Progress */
+        .circular-progress {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(#e11d48 0deg, #f1f5f9 0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.5s ease-in-out;
+        }
+        .circular-progress::before {
+            content: "";
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: white;
+        }
+        .progress-value {
+            position: relative;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans selection:bg-rose-200 selection:text-rose-900 min-h-screen flex flex-col">
+
+    <!-- INITIAL LOADING SCREEN (Prevents login flash on refresh) -->
+    <div id="initial-loader" class="fixed inset-0 bg-slate-50 z-50 flex flex-col justify-center items-center">
+        <i data-lucide="loader-2" class="w-12 h-12 text-rose-600 animate-spin mb-4"></i>
+        <h2 class="text-xl font-bold text-slate-800 tracking-tight">Lanka<span class="text-rose-600">Jobs</span></h2>
+        <p class="text-slate-500 text-sm mt-2">Loading your portal...</p>
+    </div>
+
+    <!-- Navbar (Hidden on Login Screen) -->
+    <nav id="main-nav" class="hidden bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex-shrink-0 flex items-center cursor-pointer group">
+                        <div class="w-10 h-10 bg-rose-600 rounded-lg flex items-center justify-center mr-2 group-hover:bg-rose-700 transition-colors">
+                            <i data-lucide="briefcase" class="text-white w-6 h-6"></i>
+                        </div>
+                        <span class="font-bold text-xl md:text-2xl text-slate-800 tracking-tight">Lanka<span class="text-rose-600">Jobs</span></span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="hidden md:block px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors">Home</a>
+                    <div class="hidden md:block h-6 w-px bg-gray-300 mx-1"></div>
+                    
+                    <button onclick="window.handleLogout()" class="flex items-center gap-2 bg-white border border-gray-300 text-slate-600 px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium text-sm">
+                        <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================= LOGIN VIEW ================= -->
+    <div id="login-view" class="hidden flex-1 flex justify-center items-center p-4 fade-in">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-8 text-center border border-gray-100">
+            <a href="index.html" class="flex justify-center items-center mb-6 cursor-pointer">
+                <div class="w-12 h-12 bg-rose-600 rounded-xl flex items-center justify-center mr-2 shadow-sm"><i data-lucide="briefcase" class="text-white w-7 h-7"></i></div>
+                <span class="font-bold text-3xl text-slate-800 tracking-tight">Lanka<span class="text-rose-600">Jobs</span></span>
+            </a>
+            
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Welcome Back</h2>
+            <p class="text-slate-500 mb-8 text-sm">Sign in with Google to access your Candidate Profile.</p>
+            
+            <button id="google-login-btn" onclick="window.googleSignIn()" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-slate-700 font-medium py-3.5 px-4 rounded-xl hover:bg-gray-50 shadow-sm transition-colors">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                <span id="login-btn-text">Sign in with Google</span>
+            </button>
+            
+            <a href="index.html" class="block mt-8 text-sm text-slate-500 hover:text-rose-600 font-medium transition-colors">← Return to Home</a>
+        </div>
+    </div>
+
+    <!-- ================= DASHBOARD VIEW ================= -->
+    <div id="dashboard-view" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 fade-in w-full flex-1">
+        <div class="flex flex-col md:flex-row gap-6 h-full">
+            
+            <!-- Left Sidebar -->
+            <div class="w-full md:w-64 bg-slate-900 rounded-2xl p-6 text-white shadow-xl flex flex-col flex-shrink-0">
+                <div class="flex flex-col items-center mb-8">
+                    <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-3 border-2 border-white/20 overflow-hidden">
+                        <i id="dash-avatar" data-lucide="user" class="w-10 h-10 text-slate-200"></i>
+                        <img id="dash-avatar-img" class="w-full h-full object-cover hidden" src="" alt="Avatar">
+                    </div>
+                    <h3 class="font-bold text-lg text-center leading-tight" id="dash-name">Loading...</h3>
+                    <p class="text-slate-400 text-xs text-center break-all mt-1" id="dash-email">...</p>
+                </div>
+
+                <nav class="space-y-2 flex-1">
+                    <button onclick="window.switchDashTab('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-rose-600 text-white font-medium transition-colors">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                    </button>
+                    <button onclick="window.switchDashTab('profile')" id="nav-profile" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition-colors">
+                        <i data-lucide="file-signature" class="w-5 h-5"></i> Personal Details
+                    </button>
+                </nav>
+
+                <div class="mt-8 pt-6 border-t border-slate-700/50 flex justify-center gap-4">
+                    <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="facebook" class="w-5 h-5"></i></a>
+                    <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                    <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden flex flex-col">
+                
+                <!-- TAB: Overview -->
+                <div id="tab-overview" class="fade-in space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        
+                        <!-- Profile Completeness Card -->
+                        <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col items-center justify-center">
+                            <h3 class="font-bold text-slate-700 mb-6 flex items-center gap-2 w-full"><i data-lucide="pie-chart" class="w-5 h-5 text-rose-500"></i> Profile Completeness</h3>
+                            <div class="circular-progress shadow-inner" id="progress-circle">
+                                <span class="progress-value" id="progress-text">0%</span>
+                            </div>
+                            <p class="text-sm text-slate-500 mt-6 text-center">Complete sections to improve your profile score. <a href="#" onclick="window.switchDashTab('profile')" class="text-rose-600 hover:underline font-medium">Click Here</a></p>
+                        </div>
+
+                        <!-- Document Upload Card -->
+                        <div class="rounded-2xl border border-emerald-200 shadow-sm overflow-hidden flex flex-col">
+                            <div class="bg-emerald-600 text-white p-3 px-5 font-bold flex items-center gap-2">
+                                <i data-lucide="upload-cloud" class="w-5 h-5"></i> Document Upload
+                            </div>
+                            <div class="p-6 bg-emerald-50/30 flex-1 flex flex-col justify-center items-center relative">
+                                
+                                <!-- Default Upload Prompt -->
+                                <label id="cv-upload-prompt" class="flex flex-col items-center justify-center w-full h-40 border-2 border-emerald-300 border-dashed rounded-xl cursor-pointer bg-white hover:bg-emerald-50 transition-colors">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <i data-lucide="file-up" class="w-10 h-10 mb-3 text-emerald-500"></i>
+                                        <p class="mb-1 text-sm text-emerald-700 font-semibold">Upload your files here</p>
+                                        <p class="text-xs text-emerald-500">PDF, DOC, EXCEL, PHOTOS (Max 750KB)</p>
+                                    </div>
+                                    <input type="file" id="cv-file-input" class="hidden" accept=".pdf, .doc, .docx, .xls, .xlsx, image/png, image/jpeg, image/jpg, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+                                </label>
+
+                                <!-- Action UI after selection -->
+                                <div id="cv-upload-action" class="hidden w-full flex flex-col items-center justify-center bg-white p-6 rounded-xl border border-emerald-200 shadow-sm">
+                                    <i data-lucide="file-text" class="w-12 h-12 text-emerald-600 mb-2"></i>
+                                    <p id="cv-preview-name" class="font-medium text-slate-700 text-center truncate w-full px-4 mb-4">document.pdf</p>
+                                    <div class="flex gap-3 w-full">
+                                        <button onclick="window.cancelCVUpload()" class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 font-medium text-sm transition-colors">Cancel</button>
+                                        <button onclick="window.uploadCV()" id="cv-upload-btn" class="flex-1 px-4 py-2 bg-emerald-600 rounded-lg text-white hover:bg-emerald-700 font-medium text-sm transition-colors flex justify-center items-center gap-2">
+                                            <i data-lucide="upload" class="w-4 h-4"></i> Upload Now
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Success UI -->
+                                <div id="cv-upload-success" class="hidden w-full flex flex-col items-center justify-center bg-white p-6 rounded-xl border border-emerald-200 shadow-sm">
+                                    <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-2">
+                                        <i data-lucide="check" class="w-6 h-6 text-emerald-600"></i>
+                                    </div>
+                                    <p class="font-bold text-emerald-700 mb-1">File Uploaded Successfully</p>
+                                    <a href="#" id="cv-download-link" target="_blank" class="text-sm text-emerald-600 hover:underline flex items-center gap-1"><i data-lucide="external-link" class="w-3 h-3"></i> View File</a>
+                                    <button onclick="window.resetCVUpload()" class="mt-4 text-xs text-slate-400 hover:text-slate-600 underline">Upload a different file</button>
+                                </div>
+
+                            </div>
+                            <div class="bg-emerald-700 text-white p-2 px-4 text-xs text-center">
+                                <i data-lucide="shield-check" class="w-3 h-3 inline mr-1"></i> Your documents are securely stored.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Helpdesk & Notice -->
+                    <div class="flex flex-col gap-4 mt-6">
+                        <div class="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-4 text-sm text-slate-600 shadow-sm">
+                            <div class="bg-slate-100 p-2 rounded-full"><i data-lucide="headphones" class="w-5 h-5 text-slate-700"></i></div>
+                            <div>
+                                <span class="font-bold text-slate-800">Helpdesk:</span> (+94) 11 776 5645, (+94) 77 391 8922 (8:30 a.m. - 5:00 p.m. weekdays) or <a href="#" class="text-rose-600 hover:underline">support@lankajobs.lk</a>
+                            </div>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3 text-sm text-amber-800 shadow-sm relative pr-10">
+                            <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0 text-amber-600 mt-0.5"></i>
+                            <div>
+                                <strong class="block mb-1">Service Update</strong>
+                                The <strong>Job Alert</strong> service is currently undergoing scheduled maintenance and will be unavailable until 1st March 2026. We apologize for any inconvenience.
+                            </div>
+                            <button class="absolute top-4 right-4 text-amber-600 hover:text-amber-800"><i data-lucide="x" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: Profile Setup -->
+                <div id="tab-profile" class="hidden fade-in flex-1 overflow-y-auto pr-2">
+                    <div class="bg-rose-700 text-white px-5 py-3 rounded-t-xl font-bold flex items-center justify-between">
+                        <span>Personal Details</span>
+                    </div>
+                    <div class="border border-t-0 border-gray-200 rounded-b-xl p-6 bg-slate-50 shadow-inner">
+                        <form id="profile-form" onsubmit="window.saveProfile(event)" class="space-y-6">
+                            
+                            <!-- Row 1 -->
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div class="flex flex-col">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Title <span class="text-rose-500">*</span></label>
+                                    <select id="pf-title" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                        <option value="">Select</option>
+                                        <option value="Mr">Mr.</option>
+                                        <option value="Mrs">Mrs.</option>
+                                        <option value="Miss">Miss</option>
+                                        <option value="Rev">Rev.</option>
+                                        <option value="Dr">Dr.</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-col md:col-span-1">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Last Name <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="pf-lastname" required placeholder="e.g. De Silva" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                </div>
+                                <div class="flex flex-col md:col-span-1">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Other Names <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="pf-othernames" required placeholder="e.g. Rohan David" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                </div>
+                                <div class="flex flex-col md:col-span-1">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Initials <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="pf-initials" required placeholder="e.g. R. D." class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                </div>
+                            </div>
+
+                            <!-- Row 2 -->
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div class="flex flex-col">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Date of Birth <span class="text-rose-500">*</span></label>
+                                    <input type="date" id="pf-dob" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                </div>
+                                <div class="flex flex-col md:col-span-1">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Nationality</label>
+                                    <select id="pf-nationality" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                        <option value="Sri Lankan">Sri Lankan</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-col md:col-span-1">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Marital Status</label>
+                                    <div class="flex items-center gap-4 mt-2">
+                                        <label class="flex items-center gap-1 text-sm"><input type="radio" name="marital" value="Single" checked class="text-rose-600 focus:ring-rose-500"> Single</label>
+                                        <label class="flex items-center gap-1 text-sm"><input type="radio" name="marital" value="Married" class="text-rose-600 focus:ring-rose-500"> Married</label>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col md:col-span-1">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Gender <span class="text-rose-500">*</span></label>
+                                    <div class="flex items-center gap-4 mt-2">
+                                        <label class="flex items-center gap-1 text-sm"><input type="radio" name="gender" value="Male" required class="text-rose-600 focus:ring-rose-500"> Male</label>
+                                        <label class="flex items-center gap-1 text-sm"><input type="radio" name="gender" value="Female" required class="text-rose-600 focus:ring-rose-500"> Female</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Row 3: Address -->
+                            <div class="flex flex-col">
+                                <label class="text-xs font-bold text-slate-700 mb-1">Address <span class="text-rose-500">*</span></label>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <input type="text" id="pf-address1" required placeholder="e.g. 124, Perera Avenue" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                    <input type="text" id="pf-address2" placeholder="e.g. Havelock Town" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                    <input type="text" id="pf-address3" placeholder="e.g. Colombo 05" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                </div>
+                            </div>
+
+                            <!-- Row 4 -->
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div class="flex flex-col">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">NIC No.</label>
+                                    <input type="text" id="pf-nic" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Passport No.</label>
+                                    <input type="text" id="pf-passport" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Country <span class="text-rose-500">*</span></label>
+                                    <select id="pf-country" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                        <option value="Sri Lanka">Sri Lanka</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">District/State <span class="text-rose-500">*</span></label>
+                                    <select id="pf-district" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                        <option value="">Select</option>
+                                        <option value="Colombo">Colombo</option>
+                                        <option value="Gampaha">Gampaha</option>
+                                        <option value="Kandy">Kandy</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Row 5 -->
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div class="flex flex-col">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Division/City <span class="text-rose-500">*</span></label>
+                                    <select id="pf-city" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Telephone <span class="text-rose-500">*</span></label>
+                                    <input type="tel" id="pf-telephone" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Mobile</label>
+                                    <input type="tel" id="pf-mobile" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                </div>
+                            </div>
+
+                            <!-- Row 6 -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pb-4 border-b border-gray-200">
+                                <div class="flex flex-col">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Notice Period</label>
+                                    <select id="pf-notice" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                        <option value="Immediate">Immediate</option>
+                                        <option value="1 Week">1 Week</option>
+                                        <option value="4 Weeks" selected>4 Weeks</option>
+                                        <option value="2 Months">2 Months</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Expected Salary (Rs) <span class="text-rose-500">*</span></label>
+                                    <input type="number" id="pf-salary" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Social Network ID</label>
+                                    <input type="text" id="pf-social" placeholder="LinkedIn URL etc." class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end gap-3 pt-2">
+                                <button type="button" onclick="window.switchDashTab('overview')" class="px-6 py-2.5 rounded-lg font-bold text-slate-600 bg-white border border-gray-300 hover:bg-gray-50 transition-colors">Cancel</button>
+                                <button type="submit" id="pf-save-btn" class="px-8 py-2.5 rounded-lg font-bold text-white bg-green-600 hover:bg-green-700 shadow-sm transition-colors flex items-center gap-2">
+                                    SAVE ALL
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 z-[60] flex items-center gap-3 text-white px-6 py-4 rounded-xl shadow-2xl transition-all">
+        <i id="toast-icon" data-lucide="check-circle" class="w-5 h-5"></i>
+        <span id="toast-message" class="font-medium text-sm">Message</span>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+
+        // Initialize Firebase - UPDATED WITH USER PROVIDED CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdnx9qQBFtmV7JiGmgaBvjojwoC3tuue8",
+            authDomain: "akrich-training-and-solutions.firebaseapp.com",
+            databaseURL: "https://akrich-training-and-solutions-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "akrich-training-and-solutions",
+            storageBucket: "akrich-training-and-solutions.firebasestorage.app",
+            messagingSenderId: "440525254168",
+            appId: "1:440525254168:web:c5c3112e486cc9bd111d6d",
+            measurementId: "G-NBZKSGY4EJ"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+        
+        let currentUser = null;
+        let selectedCVFile = null;
+        let isAuthInitialized = false; 
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // --- GLOBAL UI FUNCTIONS ---
+        window.showToast = (message, type = 'success') => {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = message;
+            document.getElementById('toast-icon').setAttribute('data-lucide', type === 'success' ? 'check-circle' : 'alert-circle');
+            toast.className = `fixed bottom-4 right-4 z-[60] flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl fade-in ${type==='success'?'bg-emerald-600':'bg-red-600'} text-white`;
+            lucide.createIcons();
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 4000);
+        };
+
+        window.switchDashTab = (tabId) => {
+            document.getElementById('tab-overview').classList.add('hidden');
+            document.getElementById('tab-profile').classList.add('hidden');
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            
+            document.getElementById('nav-overview').className = tabId === 'overview' 
+                ? 'w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-rose-600 text-white font-medium transition-colors'
+                : 'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition-colors';
+            
+            document.getElementById('nav-profile').className = tabId === 'profile' 
+                ? 'w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-rose-600 text-white font-medium transition-colors'
+                : 'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition-colors';
+        };
+
+        // --- AUTH LOGIC ---
+        window.googleSignIn = async () => {
+            const btnText = document.getElementById('login-btn-text');
+            btnText.innerText = "Connecting to Google...";
+            
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                
+                if (!userSnap.exists()) {
+                    await setDoc(userRef, {
+                        email: user.email,
+                        name: user.displayName,
+                        createdAt: new Date().toISOString(),
+                        photoURL: user.photoURL,
+                        profile: {}
+                    });
+                }
+                
+                window.showToast("Signed in successfully!", "success");
+            } catch (error) {
+                console.error("Google Sign-In Error:", error);
+                window.showToast("Sign in failed. " + error.message, "error");
+                btnText.innerText = "Sign in with Google";
+            }
+        };
+
+        window.handleLogout = () => {
+            signOut(auth).then(() => {
+                window.showToast("Logged out successfully.", "success");
+            });
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (!isAuthInitialized) {
+                document.getElementById('initial-loader').classList.add('hidden');
+                isAuthInitialized = true;
+            }
+
+            currentUser = user;
+            if (user) {
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('dashboard-view').classList.remove('hidden');
+                document.getElementById('main-nav').classList.remove('hidden');
+                
+                document.getElementById('dash-name').innerText = user.displayName || "Candidate";
+                document.getElementById('dash-email').innerText = user.email || "";
+                
+                if (user.photoURL) {
+                    document.getElementById('dash-avatar').classList.add('hidden');
+                    const img = document.getElementById('dash-avatar-img');
+                    img.src = user.photoURL;
+                    img.classList.remove('hidden');
+                }
+
+                fetchUserProfile();
+            } else {
+                document.getElementById('login-view').classList.remove('hidden');
+                document.getElementById('dashboard-view').classList.add('hidden');
+                document.getElementById('main-nav').classList.add('hidden');
+                document.getElementById('login-btn-text').innerText = "Sign in with Google";
+            }
+        });
+
+        // --- PROFILE FORM & PROGRESS LOGIC ---
+        const calculateCompleteness = (data) => {
+            if(!data) return 0;
+            const fields = ['title', 'lastName', 'otherNames', 'initials', 'dob', 'gender', 'address1', 'country', 'district', 'city', 'telephone', 'salary'];
+            let filled = 0;
+            fields.forEach(f => { if(data[f] && data[f].trim() !== '') filled++; });
+            return Math.round((filled / fields.length) * 100);
+        };
+
+        const updateCompletenessUI = (percent) => {
+            const circle = document.getElementById('progress-circle');
+            const text = document.getElementById('progress-text');
+            circle.style.background = `conic-gradient(#e11d48 ${percent * 3.6}deg, #f1f5f9 0deg)`;
+            text.innerText = `${percent}%`;
+        };
+
+        const fetchUserProfile = async () => {
+            if(!currentUser) return;
+            try {
+                const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    
+                    if(data.profile) {
+                        const p = data.profile;
+                        ['title', 'lastName', 'otherNames', 'initials', 'dob', 'nationality', 'address1', 'address2', 'address3', 'nic', 'passport', 'country', 'district', 'city', 'telephone', 'mobile', 'notice', 'salary', 'social'].forEach(id => {
+                            if(document.getElementById('pf-'+id) && p[id]) document.getElementById('pf-'+id).value = p[id];
+                        });
+                        if(p.marital) {
+                            const radio = document.querySelector(`input[name="marital"][value="${p.marital}"]`);
+                            if(radio) radio.checked = true;
+                        }
+                        if(p.gender) {
+                            const radio = document.querySelector(`input[name="gender"][value="${p.gender}"]`);
+                            if(radio) radio.checked = true;
+                        }
+                        updateCompletenessUI(calculateCompleteness(p));
+                    }
+                    
+                    if(data.cvUrl && data.cvName) {
+                        showCVSuccessUI(data.cvName, data.cvUrl);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching profile:", error);
+            }
+        };
+
+        window.saveProfile = async (e) => {
+            e.preventDefault();
+            if(!currentUser) return;
+            
+            const btn = document.getElementById('pf-save-btn');
+            btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Saving...';
+            lucide.createIcons();
+
+            const profileData = {
+                title: document.getElementById('pf-title').value,
+                lastName: document.getElementById('pf-lastname').value,
+                otherNames: document.getElementById('pf-othernames').value,
+                initials: document.getElementById('pf-initials').value,
+                dob: document.getElementById('pf-dob').value,
+                nationality: document.getElementById('pf-nationality').value,
+                marital: document.querySelector('input[name="marital"]:checked')?.value || '',
+                gender: document.querySelector('input[name="gender"]:checked')?.value || '',
+                address1: document.getElementById('pf-address1').value,
+                address2: document.getElementById('pf-address2').value,
+                address3: document.getElementById('pf-address3').value,
+                nic: document.getElementById('pf-nic').value,
+                passport: document.getElementById('pf-passport').value,
+                country: document.getElementById('pf-country').value,
+                district: document.getElementById('pf-district').value,
+                city: document.getElementById('pf-city').value,
+                telephone: document.getElementById('pf-telephone').value,
+                mobile: document.getElementById('pf-mobile').value,
+                notice: document.getElementById('pf-notice').value,
+                salary: document.getElementById('pf-salary').value,
+                social: document.getElementById('pf-social').value,
+            };
+
+            try {
+                await setDoc(doc(db, "users", currentUser.uid), { profile: profileData }, { merge: true });
+                window.showToast("Profile details saved successfully!", "success");
+                updateCompletenessUI(calculateCompleteness(profileData));
+                window.switchDashTab('overview');
+            } catch(err) {
+                window.showToast("Error saving profile", "error");
+                console.error(err);
+            } finally {
+                btn.innerHTML = 'SAVE ALL';
+            }
+        };
+
+        // --- CV UPLOAD LOGIC ---
+        document.getElementById('cv-file-input').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // 1. Strict Size Check (Firestore limit is 1MB. Max size set to 750KB to account for Base64 overhead)
+            if (file.size > 768000) {
+                window.showToast("File is too large for Database storage. Maximum size is 750KB.", "error");
+                event.target.value = ''; // Reset input
+                return;
+            }
+
+            // 2. UPDATED: Strict Type Check (PDF, Word, Excel, Photos)
+            const validTypes = [
+                'application/pdf', 
+                'application/msword', 
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            ];
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            const validExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png'];
+
+            // Allow if it matches the types array OR if it starts with image/ OR if extension matches
+            if (!validTypes.includes(file.type) && !file.type.startsWith('image/') && !validExtensions.includes(fileExtension)) {
+                window.showToast("Invalid format. Please upload PDF, Word, Excel, or a Photo.", "error");
+                event.target.value = ''; // Reset input
+                return;
+            }
+
+            selectedCVFile = file;
+            document.getElementById('cv-preview-name').textContent = selectedCVFile.name;
+            document.getElementById('cv-upload-prompt').classList.add('hidden');
+            document.getElementById('cv-upload-success').classList.add('hidden');
+            document.getElementById('cv-upload-action').classList.remove('hidden');
+        });
+
+        window.cancelCVUpload = () => {
+            selectedCVFile = null;
+            document.getElementById('cv-file-input').value = '';
+            document.getElementById('cv-upload-action').classList.add('hidden');
+            document.getElementById('cv-upload-prompt').classList.remove('hidden');
+        };
+
+        window.resetCVUpload = () => {
+            window.cancelCVUpload();
+            document.getElementById('cv-upload-success').classList.add('hidden');
+        };
+
+        const showCVSuccessUI = (fileName, url) => {
+            document.getElementById('cv-upload-prompt').classList.add('hidden');
+            document.getElementById('cv-upload-action').classList.add('hidden');
+            document.getElementById('cv-download-link').href = url;
+            const successUI = document.getElementById('cv-upload-success');
+            successUI.querySelector('p').innerText = fileName;
+            successUI.classList.remove('hidden');
+        };
+
+        window.uploadCV = async () => {
+            if (!selectedCVFile || !currentUser) return;
+            
+            const btn = document.getElementById('cv-upload-btn');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Saving to Database...';
+            btn.disabled = true;
+            lucide.createIcons();
+
+            try {
+                // Use FileReader to convert the file to a Base64 string to store directly in Firestore Database
+                const reader = new FileReader();
+                reader.readAsDataURL(selectedCVFile);
+                
+                reader.onload = async () => {
+                    const base64Data = reader.result;
+                    
+                    try {
+                        // Save directly to Firestore Database
+                        await setDoc(doc(db, "users", currentUser.uid), { 
+                            cvUrl: base64Data, // Save Base64 string instead of Storage URL
+                            cvName: selectedCVFile.name,
+                            cvUploadedAt: new Date().toISOString()
+                        }, { merge: true });
+
+                        window.showToast("File Saved to Database Successfully!", "success");
+                        showCVSuccessUI(selectedCVFile.name, base64Data);
+                    } catch (dbError) {
+                        console.error("Firestore Error:", dbError);
+                        // UPDATED: Now shows the real database error instead of guessing "too large"
+                        window.showToast("Error: " + (dbError.message || "Permission Denied"), "error");
+                    } finally {
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                        lucide.createIcons();
+                    }
+                };
+                
+                reader.onerror = (error) => {
+                    console.error("FileReader Error:", error);
+                    window.showToast("Failed to read file.", "error");
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                    lucide.createIcons();
+                };
+                
+            } catch (error) {
+                console.error("Upload Error:", error);
+                window.showToast("Failed to process file. Please try again.", "error");
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+                lucide.createIcons();
+            }
+        };
+    </script>
+</body>
+</html>

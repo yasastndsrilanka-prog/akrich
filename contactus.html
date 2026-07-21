@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - LankaJobs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col">
+
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex-shrink-0 flex items-center cursor-pointer group">
+                        <div class="w-10 h-10 bg-rose-600 rounded-lg flex items-center justify-center mr-2 group-hover:bg-rose-700 transition-colors">
+                            <i data-lucide="briefcase" class="text-white w-6 h-6"></i>
+                        </div>
+                        <span class="font-bold text-2xl text-slate-800 tracking-tight">Lanka<span class="text-rose-600">Jobs</span></span>
+                    </a>
+                </div>
+                <div class="hidden md:flex sm:items-center sm:space-x-4">
+                    <a href="index.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors">Home</a>
+                    <a href="postyourvacancy.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors">Post Your Vacancy</a>
+                    <a href="contactus.html" class="px-3 py-2 rounded-md text-sm font-bold text-rose-600 bg-rose-50 transition-colors">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-6xl mx-auto px-4 py-12 w-full">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-slate-800 mb-4">How can we help you?</h2>
+            <p class="text-slate-600 max-w-2xl mx-auto">Get in touch with our team for support, feedback, or to report any system issues.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg text-center">
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6"><i data-lucide="phone" class="w-8 h-8"></i></div>
+                <h3 class="text-xl font-bold text-slate-800 mb-3">Applicant Support</h3>
+                <p class="text-slate-500 text-sm mb-6">Having trouble applying or uploading your CV? Our team is available Mon-Fri.</p>
+                <p class="text-sm font-semibold text-slate-700">support@lankajobs.lk</p>
+            </div>
+            <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg text-center">
+                <div class="w-16 h-16 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-6"><i data-lucide="alert-circle" class="w-8 h-8"></i></div>
+                <h3 class="text-xl font-bold text-slate-800 mb-3">Report a Fault</h3>
+                <p class="text-slate-500 text-sm mb-6">Find a bug? Let our engineers know.</p>
+                <p class="text-sm font-semibold text-slate-700">(+94) 77 391 8922</p>
+            </div>
+            <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg text-center">
+                <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6"><i data-lucide="message-square" class="w-8 h-8"></i></div>
+                <h3 class="text-xl font-bold text-slate-800 mb-3">Feedback</h3>
+                <p class="text-slate-500 text-sm mb-6">Tell us how we can improve.</p>
+                <p class="text-sm font-semibold text-slate-700">feedback@lankajobs.lk</p>
+            </div>
+        </div>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
