@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Candidate Portal - LankaJobs</title>
+    <title>LankaJobs - Home & Candidate Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        .hidden-view { display: none !important; }
         
         /* Custom Scrollbar for dashboard */
         ::-webkit-scrollbar { width: 6px; }
@@ -46,15 +47,7 @@
 </head>
 <body class="bg-slate-50 font-sans selection:bg-rose-200 selection:text-rose-900 min-h-screen flex flex-col">
 
-    <!-- INITIAL LOADING SCREEN (Prevents login flash on refresh) -->
-    <div id="initial-loader" class="fixed inset-0 bg-slate-50 z-50 flex flex-col justify-center items-center">
-        <i data-lucide="loader-2" class="w-12 h-12 text-rose-600 animate-spin mb-4"></i>
-        <h2 class="text-xl font-bold text-slate-800 tracking-tight">Lanka<span class="text-rose-600">Jobs</span></h2>
-        <p class="text-slate-500 text-sm mt-2">Loading your portal...</p>
-    </div>
-
-    <!-- Navbar (Hidden on Login Screen) -->
-    <nav id="main-nav" class="hidden bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
@@ -62,308 +55,349 @@
                         <div class="w-10 h-10 bg-rose-600 rounded-lg flex items-center justify-center mr-2 group-hover:bg-rose-700 transition-colors">
                             <i data-lucide="briefcase" class="text-white w-6 h-6"></i>
                         </div>
-                        <span class="font-bold text-xl md:text-2xl text-slate-800 tracking-tight">Lanka<span class="text-rose-600">Jobs</span></span>
+                        <span class="font-bold text-2xl text-slate-800 tracking-tight">Lanka<span class="text-rose-600">Jobs</span></span>
                     </a>
                 </div>
                 
-                <div class="flex items-center gap-4">
-                    <a href="index.html" class="hidden md:block px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors">Home</a>
-                    <div class="hidden md:block h-6 w-px bg-gray-300 mx-1"></div>
+                <div class="hidden md:flex sm:items-center sm:space-x-4">
+                    <a href="postyourvacancy.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors">Post Your Vacancy</a>
+                    <a href="contactus.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors">Contact Us</a>
+                    <div class="h-6 w-px bg-gray-300 mx-2"></div>
                     
-                    <button onclick="window.handleLogout()" class="flex items-center gap-2 bg-white border border-gray-300 text-slate-600 px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium text-sm">
-                        <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+                    <!-- Auth Section (Desktop) -->
+                    <div id="auth-section-desktop" class="flex items-center gap-3">
+                        <button onclick="window.googleSignIn()" class="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                            Sign in with Google
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center md:hidden">
+                    <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="text-slate-500 hover:text-slate-700 p-2">
+                        <i data-lucide="menu"></i>
                     </button>
                 </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-200 p-4 space-y-2 shadow-inner">
+            <a href="index.html" class="block w-full text-left px-3 py-2 rounded-md font-medium text-rose-600 bg-rose-50">Home</a>
+            <a href="postyourvacancy.html" class="block w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-rose-50">Post Vacancy</a>
+            <a href="contactus.html" class="block w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-rose-50">Contact Us</a>
+            <hr class="my-2">
+            <div id="auth-section-mobile">
+                <button onclick="window.googleSignIn()" class="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                    Sign in with Google
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- ================= LOGIN VIEW ================= -->
-    <div id="login-view" class="hidden flex-1 flex justify-center items-center p-4 fade-in">
-        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-8 text-center border border-gray-100">
-            <a href="index.html" class="flex justify-center items-center mb-6 cursor-pointer">
-                <div class="w-12 h-12 bg-rose-600 rounded-xl flex items-center justify-center mr-2 shadow-sm"><i data-lucide="briefcase" class="text-white w-7 h-7"></i></div>
-                <span class="font-bold text-3xl text-slate-800 tracking-tight">Lanka<span class="text-rose-600">Jobs</span></span>
-            </a>
-            
-            <h2 class="text-2xl font-bold text-slate-800 mb-2">Welcome Back</h2>
-            <p class="text-slate-500 mb-8 text-sm">Sign in with Google to access your Candidate Profile.</p>
-            
-            <button id="google-login-btn" onclick="window.googleSignIn()" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-slate-700 font-medium py-3.5 px-4 rounded-xl hover:bg-gray-50 shadow-sm transition-colors">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
-                <span id="login-btn-text">Sign in with Google</span>
-            </button>
-            
-            <a href="index.html" class="block mt-8 text-sm text-slate-500 hover:text-rose-600 font-medium transition-colors">← Return to Home</a>
-        </div>
-    </div>
-
-    <!-- ================= DASHBOARD VIEW ================= -->
-    <div id="dashboard-view" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 fade-in w-full flex-1">
-        <div class="flex flex-col md:flex-row gap-6 h-full">
-            
-            <!-- Left Sidebar -->
-            <div class="w-full md:w-64 bg-slate-900 rounded-2xl p-6 text-white shadow-xl flex flex-col flex-shrink-0">
-                <div class="flex flex-col items-center mb-8">
-                    <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-3 border-2 border-white/20 overflow-hidden">
-                        <i id="dash-avatar" data-lucide="user" class="w-10 h-10 text-slate-200"></i>
-                        <img id="dash-avatar-img" class="w-full h-full object-cover hidden" src="" alt="Avatar">
-                    </div>
-                    <h3 class="font-bold text-lg text-center leading-tight" id="dash-name">Loading...</h3>
-                    <p class="text-slate-400 text-xs text-center break-all mt-1" id="dash-email">...</p>
+    <main class="flex-1 pb-12 flex flex-col">
+        <!-- ================= HOME VIEW ================= -->
+        <div id="view-home" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 fade-in w-full">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row gap-4">
+                <div class="flex-1 relative">
+                    <i data-lucide="search" class="absolute left-3 top-3 text-gray-400 w-5 h-5"></i>
+                    <input type="text" placeholder="Search by keywords, job title, or company..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none">
                 </div>
-
-                <nav class="space-y-2 flex-1">
-                    <button onclick="window.switchDashTab('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-rose-600 text-white font-medium transition-colors">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
-                    </button>
-                    <button onclick="window.switchDashTab('profile')" id="nav-profile" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition-colors">
-                        <i data-lucide="file-signature" class="w-5 h-5"></i> Personal Details
-                    </button>
-                </nav>
-
-                <div class="mt-8 pt-6 border-t border-slate-700/50 flex justify-center gap-4">
-                    <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="facebook" class="w-5 h-5"></i></a>
-                    <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="twitter" class="w-5 h-5"></i></a>
-                    <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                <div class="w-full md:w-64 relative">
+                    <input type="text" placeholder="Job Ref Number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none">
                 </div>
+                <button class="bg-rose-600 text-white px-8 py-2 rounded-lg hover:bg-rose-700 font-medium transition-colors shadow-sm">Search Jobs</button>
             </div>
 
-            <!-- Main Content Area -->
-            <div class="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden flex flex-col">
+            <div class="flex flex-col lg:flex-row gap-8 relative">
+                <!-- Categories Sidebar -->
+                <div class="w-full lg:w-72 flex-shrink-0 fade-in">
+                    <div class="bg-slate-800 rounded-t-lg p-4 text-white font-bold">Select Job Category</div>
+                    <div class="bg-white border border-gray-200 rounded-b-lg shadow-sm h-[600px] overflow-y-auto">
+                        <ul class="divide-y divide-gray-100">
+                            <li class="hover:bg-rose-50 cursor-pointer px-4 py-3 text-sm text-slate-700">IT-Software/DB/QA</li>
+                            <li class="hover:bg-rose-50 cursor-pointer px-4 py-3 text-sm text-slate-700">Accounting/Finance</li>
+                            <li class="hover:bg-rose-50 cursor-pointer px-4 py-3 text-sm text-slate-700">HR/Training</li>
+                            <li class="hover:bg-rose-50 cursor-pointer px-4 py-3 text-sm text-slate-700">Sales/Marketing</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Job Grid -->
+                <div class="flex-1">
+                    <div class="flex justify-between items-center mb-4 bg-rose-50 p-3 rounded-lg border border-rose-100">
+                        <h2 class="text-rose-800 font-bold">Latest Active Jobs Live</h2>
+                    </div>
+                    <div id="job-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        <div class="col-span-full p-8 text-center text-slate-500">
+                            <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-2 text-rose-600"></i>
+                            Loading active jobs...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= DASHBOARD VIEW ================= -->
+        <div id="view-dashboard" class="hidden-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 fade-in w-full flex-1">
+            <div class="flex flex-col md:flex-row gap-6 h-full">
                 
-                <!-- TAB: Overview -->
-                <div id="tab-overview" class="fade-in space-y-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        
-                        <!-- Profile Completeness Card -->
-                        <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col items-center justify-center">
-                            <h3 class="font-bold text-slate-700 mb-6 flex items-center gap-2 w-full"><i data-lucide="pie-chart" class="w-5 h-5 text-rose-500"></i> Profile Completeness</h3>
-                            <div class="circular-progress shadow-inner" id="progress-circle">
-                                <span class="progress-value" id="progress-text">0%</span>
-                            </div>
-                            <p class="text-sm text-slate-500 mt-6 text-center">Complete sections to improve your profile score. <a href="#" onclick="window.switchDashTab('profile')" class="text-rose-600 hover:underline font-medium">Click Here</a></p>
+                <!-- Left Sidebar -->
+                <div class="w-full md:w-64 bg-slate-900 rounded-2xl p-6 text-white shadow-xl flex flex-col flex-shrink-0">
+                    <div class="flex flex-col items-center mb-8">
+                        <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-3 border-2 border-white/20 overflow-hidden">
+                            <i id="dash-avatar" data-lucide="user" class="w-10 h-10 text-slate-200"></i>
+                            <img id="dash-avatar-img" class="w-full h-full object-cover hidden" src="" alt="Avatar">
                         </div>
-
-                        <!-- Document Upload Card -->
-                        <div class="rounded-2xl border border-emerald-200 shadow-sm overflow-hidden flex flex-col">
-                            <div class="bg-emerald-600 text-white p-3 px-5 font-bold flex items-center gap-2">
-                                <i data-lucide="upload-cloud" class="w-5 h-5"></i> Document Upload
-                            </div>
-                            <div class="p-6 bg-emerald-50/30 flex-1 flex flex-col justify-center items-center relative">
-                                
-                                <!-- Default Upload Prompt -->
-                                <label id="cv-upload-prompt" class="flex flex-col items-center justify-center w-full h-40 border-2 border-emerald-300 border-dashed rounded-xl cursor-pointer bg-white hover:bg-emerald-50 transition-colors">
-                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <i data-lucide="file-up" class="w-10 h-10 mb-3 text-emerald-500"></i>
-                                        <p class="mb-1 text-sm text-emerald-700 font-semibold">Upload your files here</p>
-                                        <p class="text-xs text-emerald-500">PDF, DOC, EXCEL, PHOTOS (Max 750KB)</p>
-                                    </div>
-                                    <input type="file" id="cv-file-input" class="hidden" accept=".pdf, .doc, .docx, .xls, .xlsx, image/png, image/jpeg, image/jpg, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
-                                </label>
-
-                                <!-- Action UI after selection -->
-                                <div id="cv-upload-action" class="hidden w-full flex flex-col items-center justify-center bg-white p-6 rounded-xl border border-emerald-200 shadow-sm">
-                                    <i data-lucide="file-text" class="w-12 h-12 text-emerald-600 mb-2"></i>
-                                    <p id="cv-preview-name" class="font-medium text-slate-700 text-center truncate w-full px-4 mb-4">document.pdf</p>
-                                    <div class="flex gap-3 w-full">
-                                        <button onclick="window.cancelCVUpload()" class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 font-medium text-sm transition-colors">Cancel</button>
-                                        <button onclick="window.uploadCV()" id="cv-upload-btn" class="flex-1 px-4 py-2 bg-emerald-600 rounded-lg text-white hover:bg-emerald-700 font-medium text-sm transition-colors flex justify-center items-center gap-2">
-                                            <i data-lucide="upload" class="w-4 h-4"></i> Upload Now
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Success UI -->
-                                <div id="cv-upload-success" class="hidden w-full flex flex-col items-center justify-center bg-white p-6 rounded-xl border border-emerald-200 shadow-sm">
-                                    <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-2">
-                                        <i data-lucide="check" class="w-6 h-6 text-emerald-600"></i>
-                                    </div>
-                                    <p class="font-bold text-emerald-700 mb-1">File Uploaded Successfully</p>
-                                    <a href="#" id="cv-download-link" target="_blank" class="text-sm text-emerald-600 hover:underline flex items-center gap-1"><i data-lucide="external-link" class="w-3 h-3"></i> View File</a>
-                                    <button onclick="window.resetCVUpload()" class="mt-4 text-xs text-slate-400 hover:text-slate-600 underline">Upload a different file</button>
-                                </div>
-
-                            </div>
-                            <div class="bg-emerald-700 text-white p-2 px-4 text-xs text-center">
-                                <i data-lucide="shield-check" class="w-3 h-3 inline mr-1"></i> Your documents are securely stored.
-                            </div>
-                        </div>
+                        <h3 class="font-bold text-lg text-center" id="dash-name">Loading...</h3>
+                        <p class="text-slate-400 text-xs text-center break-all" id="dash-email">...</p>
                     </div>
 
-                    <!-- Helpdesk & Notice -->
-                    <div class="flex flex-col gap-4 mt-6">
-                        <div class="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-4 text-sm text-slate-600 shadow-sm">
-                            <div class="bg-slate-100 p-2 rounded-full"><i data-lucide="headphones" class="w-5 h-5 text-slate-700"></i></div>
-                            <div>
-                                <span class="font-bold text-slate-800">Helpdesk:</span> (+94) 11 776 5645, (+94) 77 391 8922 (8:30 a.m. - 5:00 p.m. weekdays) or <a href="#" class="text-rose-600 hover:underline">support@lankajobs.lk</a>
-                            </div>
-                        </div>
-                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3 text-sm text-amber-800 shadow-sm relative pr-10">
-                            <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0 text-amber-600 mt-0.5"></i>
-                            <div>
-                                <strong class="block mb-1">Service Update</strong>
-                                The <strong>Job Alert</strong> service is currently undergoing scheduled maintenance and will be unavailable until 1st March 2026. We apologize for any inconvenience.
-                            </div>
-                            <button class="absolute top-4 right-4 text-amber-600 hover:text-amber-800"><i data-lucide="x" class="w-4 h-4"></i></button>
-                        </div>
+                    <nav class="space-y-2 flex-1">
+                        <button onclick="window.switchDashTab('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-rose-600 text-white font-medium transition-colors">
+                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                        </button>
+                        <button onclick="window.switchDashTab('profile')" id="nav-profile" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition-colors">
+                            <i data-lucide="file-signature" class="w-5 h-5"></i> Personal Details
+                        </button>
+                    </nav>
+
+                    <div class="mt-8 pt-6 border-t border-slate-700/50 flex justify-center gap-4">
+                        <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="facebook" class="w-5 h-5"></i></a>
+                        <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                        <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                        <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="instagram" class="w-5 h-5"></i></a>
                     </div>
                 </div>
 
-                <!-- TAB: Profile Setup -->
-                <div id="tab-profile" class="hidden fade-in flex-1 overflow-y-auto pr-2">
-                    <div class="bg-rose-700 text-white px-5 py-3 rounded-t-xl font-bold flex items-center justify-between">
-                        <span>Personal Details</span>
-                    </div>
-                    <div class="border border-t-0 border-gray-200 rounded-b-xl p-6 bg-slate-50 shadow-inner">
-                        <form id="profile-form" onsubmit="window.saveProfile(event)" class="space-y-6">
+                <!-- Main Content Area -->
+                <div class="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden flex flex-col">
+                    
+                    <!-- TAB: Overview -->
+                    <div id="tab-overview" class="fade-in space-y-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             
-                            <!-- Row 1 -->
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div class="flex flex-col">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Title <span class="text-rose-500">*</span></label>
-                                    <select id="pf-title" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                        <option value="">Select</option>
-                                        <option value="Mr">Mr.</option>
-                                        <option value="Mrs">Mrs.</option>
-                                        <option value="Miss">Miss</option>
-                                        <option value="Rev">Rev.</option>
-                                        <option value="Dr">Dr.</option>
-                                    </select>
+                            <!-- Profile Completeness Card -->
+                            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col items-center justify-center">
+                                <h3 class="font-bold text-slate-700 mb-6 flex items-center gap-2 w-full"><i data-lucide="pie-chart" class="w-5 h-5 text-rose-500"></i> Profile Completeness</h3>
+                                <div class="circular-progress shadow-inner" id="progress-circle">
+                                    <span class="progress-value" id="progress-text">0%</span>
                                 </div>
-                                <div class="flex flex-col md:col-span-1">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Last Name <span class="text-rose-500">*</span></label>
-                                    <input type="text" id="pf-lastname" required placeholder="e.g. De Silva" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                </div>
-                                <div class="flex flex-col md:col-span-1">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Other Names <span class="text-rose-500">*</span></label>
-                                    <input type="text" id="pf-othernames" required placeholder="e.g. Rohan David" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                </div>
-                                <div class="flex flex-col md:col-span-1">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Initials <span class="text-rose-500">*</span></label>
-                                    <input type="text" id="pf-initials" required placeholder="e.g. R. D." class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                </div>
+                                <p class="text-sm text-slate-500 mt-6 text-center">Complete sections to improve your profile score. <a href="#" onclick="window.switchDashTab('profile')" class="text-rose-600 hover:underline font-medium">Click Here</a></p>
                             </div>
 
-                            <!-- Row 2 -->
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div class="flex flex-col">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Date of Birth <span class="text-rose-500">*</span></label>
-                                    <input type="date" id="pf-dob" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                            <!-- CV Upload Card -->
+                            <div class="rounded-2xl border border-emerald-200 shadow-sm overflow-hidden flex flex-col">
+                                <div class="bg-emerald-600 text-white p-3 px-5 font-bold flex items-center gap-2">
+                                    <i data-lucide="upload-cloud" class="w-5 h-5"></i> CV Upload
                                 </div>
-                                <div class="flex flex-col md:col-span-1">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Nationality</label>
-                                    <select id="pf-nationality" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                        <option value="Sri Lankan">Sri Lankan</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
-                                <div class="flex flex-col md:col-span-1">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Marital Status</label>
-                                    <div class="flex items-center gap-4 mt-2">
-                                        <label class="flex items-center gap-1 text-sm"><input type="radio" name="marital" value="Single" checked class="text-rose-600 focus:ring-rose-500"> Single</label>
-                                        <label class="flex items-center gap-1 text-sm"><input type="radio" name="marital" value="Married" class="text-rose-600 focus:ring-rose-500"> Married</label>
+                                <div class="p-6 bg-emerald-50/30 flex-1 flex flex-col justify-center items-center relative">
+                                    
+                                    <!-- Default Upload Prompt -->
+                                    <label id="cv-upload-prompt" class="flex flex-col items-center justify-center w-full h-40 border-2 border-emerald-300 border-dashed rounded-xl cursor-pointer bg-white hover:bg-emerald-50 transition-colors">
+                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <i data-lucide="file-up" class="w-10 h-10 mb-3 text-emerald-500"></i>
+                                            <p class="mb-1 text-sm text-emerald-700 font-semibold">Upload your CV here</p>
+                                            <p class="text-xs text-emerald-500">PDF, DOC, DOCX up to 750KB</p>
+                                        </div>
+                                        <input type="file" id="cv-file-input" class="hidden" accept=".pdf,.doc,.docx" />
+                                    </label>
+
+                                    <!-- Action UI after selection -->
+                                    <div id="cv-upload-action" class="hidden w-full flex flex-col items-center justify-center bg-white p-6 rounded-xl border border-emerald-200 shadow-sm">
+                                        <i data-lucide="file-text" class="w-12 h-12 text-emerald-600 mb-2"></i>
+                                        <p id="cv-preview-name" class="font-medium text-slate-700 text-center truncate w-full px-4 mb-4">document.pdf</p>
+                                        <div class="flex gap-3 w-full">
+                                            <button onclick="window.cancelCVUpload()" class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 font-medium text-sm transition-colors">Cancel</button>
+                                            <button onclick="window.uploadCV()" id="cv-upload-btn" class="flex-1 px-4 py-2 bg-emerald-600 rounded-lg text-white hover:bg-emerald-700 font-medium text-sm transition-colors flex justify-center items-center gap-2">
+                                                <i data-lucide="upload" class="w-4 h-4"></i> Upload Now
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="flex flex-col md:col-span-1">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Gender <span class="text-rose-500">*</span></label>
-                                    <div class="flex items-center gap-4 mt-2">
-                                        <label class="flex items-center gap-1 text-sm"><input type="radio" name="gender" value="Male" required class="text-rose-600 focus:ring-rose-500"> Male</label>
-                                        <label class="flex items-center gap-1 text-sm"><input type="radio" name="gender" value="Female" required class="text-rose-600 focus:ring-rose-500"> Female</label>
+                                    
+                                    <!-- Success UI -->
+                                    <div id="cv-upload-success" class="hidden w-full flex flex-col items-center justify-center bg-white p-6 rounded-xl border border-emerald-200 shadow-sm">
+                                        <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-2">
+                                            <i data-lucide="check" class="w-6 h-6 text-emerald-600"></i>
+                                        </div>
+                                        <p class="font-bold text-emerald-700 mb-1">CV Saved Successfully</p>
+                                        <button onclick="window.resetCVUpload()" class="mt-4 text-xs text-slate-400 hover:text-slate-600 underline">Upload a different file</button>
                                     </div>
-                                </div>
-                            </div>
 
-                            <!-- Row 3: Address -->
-                            <div class="flex flex-col">
-                                <label class="text-xs font-bold text-slate-700 mb-1">Address <span class="text-rose-500">*</span></label>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <input type="text" id="pf-address1" required placeholder="e.g. 124, Perera Avenue" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                    <input type="text" id="pf-address2" placeholder="e.g. Havelock Town" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                    <input type="text" id="pf-address3" placeholder="e.g. Colombo 05" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                </div>
+                                <div class="bg-emerald-700 text-white p-2 px-4 text-xs text-center">
+                                    <i data-lucide="shield-check" class="w-3 h-3 inline mr-1"></i> Your CV is only shared with employers you apply to.
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Row 4 -->
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div class="flex flex-col">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">NIC No.</label>
-                                    <input type="text" id="pf-nic" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                </div>
-                                <div class="flex flex-col">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Passport No.</label>
-                                    <input type="text" id="pf-passport" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                </div>
-                                <div class="flex flex-col">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Country <span class="text-rose-500">*</span></label>
-                                    <select id="pf-country" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                        <option value="Sri Lanka">Sri Lanka</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
-                                <div class="flex flex-col">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">District/State <span class="text-rose-500">*</span></label>
-                                    <select id="pf-district" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                        <option value="">Select</option>
-                                        <option value="Colombo">Colombo</option>
-                                        <option value="Gampaha">Gampaha</option>
-                                        <option value="Kandy">Kandy</option>
-                                    </select>
+                        <!-- Helpdesk & Notice -->
+                        <div class="flex flex-col gap-4 mt-4">
+                            <div class="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-4 text-sm text-slate-600 shadow-sm">
+                                <div class="bg-slate-100 p-2 rounded-full"><i data-lucide="headphones" class="w-5 h-5 text-slate-700"></i></div>
+                                <div>
+                                    <span class="font-bold text-slate-800">Helpdesk:</span> (+94) 11 776 5645, (+94) 77 391 8922 (8:30 a.m. - 5:00 p.m. weekdays) or <a href="#" class="text-rose-600 hover:underline">support@lankajobs.lk</a>
                                 </div>
                             </div>
-
-                            <!-- Row 5 -->
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div class="flex flex-col">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Division/City <span class="text-rose-500">*</span></label>
-                                    <select id="pf-city" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
-                                <div class="flex flex-col">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Telephone <span class="text-rose-500">*</span></label>
-                                    <input type="tel" id="pf-telephone" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                </div>
-                                <div class="flex flex-col">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Mobile</label>
-                                    <input type="tel" id="pf-mobile" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                </div>
-                            </div>
-
-                            <!-- Row 6 -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pb-4 border-b border-gray-200">
-                                <div class="flex flex-col">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Notice Period</label>
-                                    <select id="pf-notice" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                        <option value="Immediate">Immediate</option>
-                                        <option value="1 Week">1 Week</option>
-                                        <option value="4 Weeks" selected>4 Weeks</option>
-                                        <option value="2 Months">2 Months</option>
-                                    </select>
-                                </div>
-                                <div class="flex flex-col">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Expected Salary (Rs) <span class="text-rose-500">*</span></label>
-                                    <input type="number" id="pf-salary" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                </div>
-                                <div class="flex flex-col">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Social Network ID</label>
-                                    <input type="text" id="pf-social" placeholder="LinkedIn URL etc." class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                </div>
-                            </div>
-
-                            <div class="flex justify-end gap-3 pt-2">
-                                <button type="button" onclick="window.switchDashTab('overview')" class="px-6 py-2.5 rounded-lg font-bold text-slate-600 bg-white border border-gray-300 hover:bg-gray-50 transition-colors">Cancel</button>
-                                <button type="submit" id="pf-save-btn" class="px-8 py-2.5 rounded-lg font-bold text-white bg-green-600 hover:bg-green-700 shadow-sm transition-colors flex items-center gap-2">
-                                    SAVE ALL
-                                </button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
 
+                    <!-- TAB: Profile Setup -->
+                    <div id="tab-profile" class="hidden-view fade-in flex-1 overflow-y-auto pr-2">
+                        <div class="bg-rose-700 text-white px-5 py-3 rounded-t-xl font-bold flex items-center justify-between">
+                            <span>Personal Details</span>
+                        </div>
+                        <div class="border border-t-0 border-gray-200 rounded-b-xl p-6 bg-slate-50 shadow-inner">
+                            <form id="profile-form" onsubmit="window.saveProfile(event)" class="space-y-6">
+                                
+                                <!-- Row 1 -->
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <div class="flex flex-col">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Title <span class="text-rose-500">*</span></label>
+                                        <select id="pf-title" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                            <option value="">Select</option>
+                                            <option value="Mr">Mr.</option>
+                                            <option value="Mrs">Mrs.</option>
+                                            <option value="Miss">Miss</option>
+                                            <option value="Rev">Rev.</option>
+                                            <option value="Dr">Dr.</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex flex-col md:col-span-1">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Last Name <span class="text-rose-500">*</span></label>
+                                        <input type="text" id="pf-lastname" required placeholder="e.g. De Silva" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                    </div>
+                                    <div class="flex flex-col md:col-span-1">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Other Names <span class="text-rose-500">*</span></label>
+                                        <input type="text" id="pf-othernames" required placeholder="e.g. Rohan David" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                    </div>
+                                    <div class="flex flex-col md:col-span-1">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Initials <span class="text-rose-500">*</span></label>
+                                        <input type="text" id="pf-initials" required placeholder="e.g. R. D." class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                    </div>
+                                </div>
+
+                                <!-- Row 2 -->
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <div class="flex flex-col">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Date of Birth <span class="text-rose-500">*</span></label>
+                                        <input type="date" id="pf-dob" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                    </div>
+                                    <div class="flex flex-col md:col-span-1">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Nationality</label>
+                                        <select id="pf-nationality" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                            <option value="Sri Lankan">Sri Lankan</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex flex-col md:col-span-1">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Marital Status</label>
+                                        <div class="flex items-center gap-4 mt-2">
+                                            <label class="flex items-center gap-1 text-sm"><input type="radio" name="marital" value="Single" checked class="text-rose-600 focus:ring-rose-500"> Single</label>
+                                            <label class="flex items-center gap-1 text-sm"><input type="radio" name="marital" value="Married" class="text-rose-600 focus:ring-rose-500"> Married</label>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col md:col-span-1">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Gender <span class="text-rose-500">*</span></label>
+                                        <div class="flex items-center gap-4 mt-2">
+                                            <label class="flex items-center gap-1 text-sm"><input type="radio" name="gender" value="Male" required class="text-rose-600 focus:ring-rose-500"> Male</label>
+                                            <label class="flex items-center gap-1 text-sm"><input type="radio" name="gender" value="Female" required class="text-rose-600 focus:ring-rose-500"> Female</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Row 3: Address -->
+                                <div class="flex flex-col">
+                                    <label class="text-xs font-bold text-slate-700 mb-1">Address <span class="text-rose-500">*</span></label>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <input type="text" id="pf-address1" required placeholder="e.g. 124, Perera Avenue" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                        <input type="text" id="pf-address2" placeholder="e.g. Havelock Town" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                        <input type="text" id="pf-address3" placeholder="e.g. Colombo 05" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                    </div>
+                                </div>
+
+                                <!-- Row 4 -->
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <div class="flex flex-col">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">NIC No.</label>
+                                        <input type="text" id="pf-nic" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Passport No.</label>
+                                        <input type="text" id="pf-passport" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Country <span class="text-rose-500">*</span></label>
+                                        <select id="pf-country" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                            <option value="Sri Lanka">Sri Lanka</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">District/State <span class="text-rose-500">*</span></label>
+                                        <select id="pf-district" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                            <option value="">Select</option>
+                                            <option value="Colombo">Colombo</option>
+                                            <option value="Gampaha">Gampaha</option>
+                                            <option value="Kandy">Kandy</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Row 5 -->
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <div class="flex flex-col">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Division/City <span class="text-rose-500">*</span></label>
+                                        <select id="pf-city" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Telephone <span class="text-rose-500">*</span></label>
+                                        <input type="tel" id="pf-telephone" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Mobile</label>
+                                        <input type="tel" id="pf-mobile" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                    </div>
+                                </div>
+
+                                <!-- Row 6 -->
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pb-4 border-b border-gray-200">
+                                    <div class="flex flex-col">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Notice Period</label>
+                                        <select id="pf-notice" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                            <option value="Immediate">Immediate</option>
+                                            <option value="1 Week">1 Week</option>
+                                            <option value="4 Weeks" selected>4 Weeks</option>
+                                            <option value="2 Months">2 Months</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Expected Salary (Rs) <span class="text-rose-500">*</span></label>
+                                        <input type="number" id="pf-salary" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label class="text-xs font-bold text-slate-700 mb-1">Social Network ID</label>
+                                        <input type="text" id="pf-social" placeholder="LinkedIn URL etc." class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end gap-3 pt-2">
+                                    <button type="button" onclick="window.switchDashTab('overview')" class="px-6 py-2.5 rounded-lg font-bold text-slate-600 bg-white border border-gray-300 hover:bg-gray-50 transition-colors">Cancel</button>
+                                    <button type="submit" id="pf-save-btn" class="px-8 py-2.5 rounded-lg font-bold text-white bg-green-600 hover:bg-green-700 shadow-sm transition-colors flex items-center gap-2">
+                                        SAVE ALL
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Toast Notification -->
     <div id="toast" class="hidden fixed bottom-4 right-4 z-[60] flex items-center gap-3 text-white px-6 py-4 rounded-xl shadow-2xl transition-all">
@@ -374,33 +408,24 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Initialize Firebase - UPDATED WITH USER PROVIDED CONFIG
+        // Initialize Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBdnx9qQBFtmV7JiGmgaBvjojwoC3tuue8",
             authDomain: "akrich-training-and-solutions.firebaseapp.com",
-            databaseURL: "https://akrich-training-and-solutions-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "akrich-training-and-solutions",
             storageBucket: "akrich-training-and-solutions.firebasestorage.app",
             messagingSenderId: "440525254168",
-            appId: "1:440525254168:web:c5c3112e486cc9bd111d6d",
-            measurementId: "G-NBZKSGY4EJ"
+            appId: "1:440525254168:web:c5c3112e486cc9bd111d6d"
         };
-        
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
         
         let currentUser = null;
         let selectedCVFile = null;
-        let isAuthInitialized = false; 
-
-        // Initialize Lucide Icons
-        lucide.createIcons();
+        window.currentView = 'home';
 
         // --- GLOBAL UI FUNCTIONS ---
         window.showToast = (message, type = 'success') => {
@@ -410,13 +435,28 @@
             toast.className = `fixed bottom-4 right-4 z-[60] flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl fade-in ${type==='success'?'bg-emerald-600':'bg-red-600'} text-white`;
             lucide.createIcons();
             toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 4000);
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        };
+
+        window.switchMainView = (viewId) => {
+            window.currentView = viewId;
+            document.getElementById('view-home').classList.add('hidden-view');
+            document.getElementById('view-dashboard').classList.add('hidden-view');
+            document.getElementById('view-' + viewId).classList.remove('hidden-view');
+            if(viewId === 'dashboard' && currentUser) fetchUserProfile();
+        };
+
+        window.handleDashboardClick = (e) => {
+            if (window.location.protocol === 'blob:' || window.location.protocol === 'data:' || !window.location.hostname) {
+                e.preventDefault();
+                window.switchMainView('dashboard');
+            }
         };
 
         window.switchDashTab = (tabId) => {
-            document.getElementById('tab-overview').classList.add('hidden');
-            document.getElementById('tab-profile').classList.add('hidden');
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.getElementById('tab-overview').classList.add('hidden-view');
+            document.getElementById('tab-profile').classList.add('hidden-view');
+            document.getElementById('tab-' + tabId).classList.remove('hidden-view');
             
             document.getElementById('nav-overview').className = tabId === 'overview' 
                 ? 'w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-rose-600 text-white font-medium transition-colors'
@@ -427,11 +467,9 @@
                 : 'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition-colors';
         };
 
-        // --- AUTH LOGIC ---
+        // --- AUTH LOGIC (Google Sign-In) ---
         window.googleSignIn = async () => {
-            const btnText = document.getElementById('login-btn-text');
-            btnText.innerText = "Connecting to Google...";
-            
+            const provider = new GoogleAuthProvider();
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
@@ -445,37 +483,38 @@
                         name: user.displayName,
                         createdAt: new Date().toISOString(),
                         photoURL: user.photoURL,
-                        profile: {}
+                        profile: {} 
                     });
                 }
                 
-                window.showToast("Signed in successfully!", "success");
+                window.showToast("Successfully signed in with Google!", "success");
             } catch (error) {
                 console.error("Google Sign-In Error:", error);
                 window.showToast("Sign in failed. " + error.message, "error");
-                btnText.innerText = "Sign in with Google";
             }
         };
 
         window.handleLogout = () => {
             signOut(auth).then(() => {
                 window.showToast("Logged out successfully.", "success");
+                window.location.href = 'index.html'; 
             });
         };
 
         onAuthStateChanged(auth, (user) => {
-            if (!isAuthInitialized) {
-                document.getElementById('initial-loader').classList.add('hidden');
-                isAuthInitialized = true;
-            }
-
             currentUser = user;
+            const isLoginPage = window.location.pathname.endsWith('login.html');
+
             if (user) {
-                document.getElementById('login-view').classList.add('hidden');
-                document.getElementById('dashboard-view').classList.remove('hidden');
-                document.getElementById('main-nav').classList.remove('hidden');
+                const navHtml = `
+                    <a href="login.html" onclick="window.handleDashboardClick(event)" class="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors shadow-sm font-medium"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</a>
+                    <button onclick="window.handleLogout()" class="text-slate-400 hover:text-rose-600 ml-2" title="Logout"><i data-lucide="log-out" class="w-5 h-5"></i></button>
+                `;
                 
-                document.getElementById('dash-name').innerText = user.displayName || "Candidate";
+                document.getElementById('auth-section-desktop').innerHTML = navHtml;
+                document.getElementById('auth-section-mobile').innerHTML = navHtml.replace('px-4 py-2', 'w-full px-4 py-2 justify-center');
+                
+                document.getElementById('dash-name').innerText = user.displayName || "Candidate User";
                 document.getElementById('dash-email').innerText = user.email || "";
                 
                 if (user.photoURL) {
@@ -485,16 +524,35 @@
                     img.classList.remove('hidden');
                 }
 
-                fetchUserProfile();
+                if (isLoginPage || window.currentView === 'dashboard') {
+                    window.switchMainView('dashboard');
+                }
             } else {
-                document.getElementById('login-view').classList.remove('hidden');
-                document.getElementById('dashboard-view').classList.add('hidden');
-                document.getElementById('main-nav').classList.add('hidden');
-                document.getElementById('login-btn-text').innerText = "Sign in with Google";
+                const loginBtnHtml = `
+                    <button onclick="window.googleSignIn()" class="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                        Sign in with Google
+                    </button>
+                `;
+                document.getElementById('auth-section-desktop').innerHTML = loginBtnHtml;
+                document.getElementById('auth-section-mobile').innerHTML = loginBtnHtml.replace('px-4 py-2', 'w-full px-4 py-2 justify-center');
+                
+                if (isLoginPage) {
+                    window.location.href = 'index.html';
+                }
+            }
+            lucide.createIcons();
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.location.pathname.endsWith('login.html')) {
+                window.switchMainView('dashboard');
+            } else {
+                window.switchMainView('home');
             }
         });
 
-        // --- PROFILE FORM & PROGRESS LOGIC ---
+        // --- STREAMING_CHUNK:Profile Logic ---
         const calculateCompleteness = (data) => {
             if(!data) return 0;
             const fields = ['title', 'lastName', 'otherNames', 'initials', 'dob', 'gender', 'address1', 'country', 'district', 'city', 'telephone', 'salary'];
@@ -534,7 +592,7 @@
                     }
                     
                     if(data.cvUrl && data.cvName) {
-                        showCVSuccessUI(data.cvName, data.cvUrl);
+                        showCVSuccessUI(data.cvName);
                     }
                 }
             } catch (error) {
@@ -587,33 +645,14 @@
             }
         };
 
-        // --- CV UPLOAD LOGIC ---
+        // --- STREAMING_CHUNK:CV Upload Logic ---
         document.getElementById('cv-file-input').addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (!file) return;
 
-            // 1. Strict Size Check (Firestore limit is 1MB. Max size set to 750KB to account for Base64 overhead)
             if (file.size > 768000) {
                 window.showToast("File is too large for Database storage. Maximum size is 750KB.", "error");
-                event.target.value = ''; // Reset input
-                return;
-            }
-
-            // 2. UPDATED: Strict Type Check (PDF, Word, Excel, Photos)
-            const validTypes = [
-                'application/pdf', 
-                'application/msword', 
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                'application/vnd.ms-excel',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            ];
-            const fileExtension = file.name.split('.').pop().toLowerCase();
-            const validExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png'];
-
-            // Allow if it matches the types array OR if it starts with image/ OR if extension matches
-            if (!validTypes.includes(file.type) && !file.type.startsWith('image/') && !validExtensions.includes(fileExtension)) {
-                window.showToast("Invalid format. Please upload PDF, Word, Excel, or a Photo.", "error");
-                event.target.value = ''; // Reset input
+                event.target.value = '';
                 return;
             }
 
@@ -636,12 +675,11 @@
             document.getElementById('cv-upload-success').classList.add('hidden');
         };
 
-        const showCVSuccessUI = (fileName, url) => {
+        const showCVSuccessUI = (fileName) => {
             document.getElementById('cv-upload-prompt').classList.add('hidden');
             document.getElementById('cv-upload-action').classList.add('hidden');
-            document.getElementById('cv-download-link').href = url;
             const successUI = document.getElementById('cv-upload-success');
-            successUI.querySelector('p').innerText = fileName;
+            successUI.querySelector('p').innerText = "CV Saved: " + fileName;
             successUI.classList.remove('hidden');
         };
 
@@ -650,12 +688,11 @@
             
             const btn = document.getElementById('cv-upload-btn');
             const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Saving to Database...';
+            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Saving...';
             btn.disabled = true;
             lucide.createIcons();
 
             try {
-                // Use FileReader to convert the file to a Base64 string to store directly in Firestore Database
                 const reader = new FileReader();
                 reader.readAsDataURL(selectedCVFile);
                 
@@ -663,42 +700,63 @@
                     const base64Data = reader.result;
                     
                     try {
-                        // Save directly to Firestore Database
                         await setDoc(doc(db, "users", currentUser.uid), { 
-                            cvUrl: base64Data, // Save Base64 string instead of Storage URL
+                            cvUrl: base64Data,
                             cvName: selectedCVFile.name,
                             cvUploadedAt: new Date().toISOString()
                         }, { merge: true });
 
-                        window.showToast("File Saved to Database Successfully!", "success");
-                        showCVSuccessUI(selectedCVFile.name, base64Data);
+                        window.showToast("CV Saved Successfully!", "success");
+                        showCVSuccessUI(selectedCVFile.name);
                     } catch (dbError) {
                         console.error("Firestore Error:", dbError);
-                        // UPDATED: Now shows the real database error instead of guessing "too large"
-                        window.showToast("Error: " + (dbError.message || "Permission Denied"), "error");
+                        window.showToast("Error saving CV.", "error");
                     } finally {
                         btn.innerHTML = originalHtml;
                         btn.disabled = false;
                         lucide.createIcons();
                     }
                 };
-                
-                reader.onerror = (error) => {
-                    console.error("FileReader Error:", error);
-                    window.showToast("Failed to read file.", "error");
-                    btn.innerHTML = originalHtml;
-                    btn.disabled = false;
-                    lucide.createIcons();
-                };
-                
             } catch (error) {
                 console.error("Upload Error:", error);
-                window.showToast("Failed to process file. Please try again.", "error");
+                window.showToast("Failed to process file.", "error");
                 btn.innerHTML = originalHtml;
                 btn.disabled = false;
                 lucide.createIcons();
             }
         };
+
+        // --- STREAMING_CHUNK:Fetching Live Jobs ---
+        // CRITICAL UPDATE: Pulls from 'vacancies' collection, not 'jobs'.
+        const jobsQuery = query(collection(db, "vacancies"), where("status", "==", "active"));
+        
+        onSnapshot(jobsQuery, (snapshot) => {
+            let activeJobs = [];
+            snapshot.forEach((doc) => activeJobs.push({ id: doc.id, ...doc.data() }));
+            
+            const grid = document.getElementById('job-grid');
+            if(activeJobs.length === 0) {
+                grid.innerHTML = '<div class="col-span-full p-8 text-center text-slate-500">No active jobs found currently.</div>';
+            } else {
+                grid.innerHTML = activeJobs.map(job => `
+                    <a href="job-details.html?id=${job.id}" target="_blank" class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-rose-300 cursor-pointer transition-all flex flex-col relative group overflow-hidden block">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-slate-200 group-hover:bg-rose-500 transition-colors"></div>
+                        <div class="flex-1 pl-2">
+                            <h3 class="text-lg font-bold text-slate-800 mb-1 group-hover:text-rose-600 line-clamp-2">${job.title || job.position || 'Untitled Position'}</h3>
+                            <div class="text-sm font-medium text-slate-500 flex items-center gap-1.5 mb-2"><i data-lucide="building" class="w-3 h-3"></i> ${job.company || job.companyName || 'Unknown Company'}</div>
+                            <div class="text-xs font-medium text-slate-400 flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3 h-3"></i> ${job.district || job.location || 'Sri Lanka'}</div>
+                        </div>
+                    </a>
+                `).join('');
+            }
+            lucide.createIcons();
+        }, (error) => {
+            // Handle permissions errors gracefully
+            console.error("Error loading jobs:", error);
+            document.getElementById('job-grid').innerHTML = '<div class="col-span-full p-8 text-center text-rose-500">Could not load jobs. Please check database permissions.</div>';
+        });
+
+        lucide.createIcons();
     </script>
 </body>
 </html>
