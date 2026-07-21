@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Details - LankaJobs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        
+        /* Print styles to hide navigation and only print the artwork/details */
+        @media print {
+            nav, .no-print { display: none !important; }
+            body { background: white; }
+            .print-container { box-shadow: none; border: none; padding: 0; margin: 0; max-width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans min-h-screen flex flex-col selection:bg-rose-200 selection:text-rose-900">
+
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex-shrink-0 flex items-center cursor-pointer group">
+                        <div class="w-10 h-10 bg-rose-600 rounded-lg flex items-center justify-center mr-2 group-hover:bg-rose-700 transition-colors">
+                            <i data-lucide="briefcase" class="text-white w-6 h-6"></i>
+                        </div>
+                        <span class="font-bold text-2xl text-slate-800 tracking-tight">Lanka<span class="text-rose-600">Jobs</span></span>
+                    </a>
+                </div>
+                <div class="flex items-center">
+                    <a href="index.html" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-2">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Jobs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6 md:py-10 fade-in print-container">
+        
+        <!-- Loading UI -->
+        <div id="loading-state" class="flex flex-col items-center justify-center py-32 no-print">
+            <i data-lucide="loader-2" class="w-10 h-10 animate-spin text-rose-600 mb-4"></i>
+            <h2 class="text-xl font-bold text-slate-700">Loading Vacancy Details...</h2>
+        </div>
+
+        <!-- Error UI -->
+        <div id="error-state" class="hidden flex flex-col items-center justify-center py-32 no-print">
+            <div class="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mb-4">
+                <i data-lucide="alert-circle" class="w-8 h-8 text-rose-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Vacancy Not Found</h2>
+            <p class="text-slate-500 mb-6">This job might have expired or the link is invalid.</p>
+            <a href="index.html" class="px-6 py-2 bg-rose-600 text-white font-bold rounded-lg hover:bg-rose-700">Browse Jobs</a>
+        </div>
+
+        <div id="job-content" class="hidden bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+            
+            <!-- 1. Top Info Bar (Company, Ref, Dates) -->
+            <div class="bg-slate-50 px-6 py-4 border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="building-2" class="w-6 h-6 text-rose-600"></i>
+                    </div>
+                    <div>
+                        <h2 id="jd-company" class="font-bold text-lg text-slate-800 leading-tight">Company Name</h2>
+                        <p id="jd-location" class="text-sm text-slate-500 flex items-center gap-1">
+                            <i data-lucide="map-pin" class="w-3 h-3"></i> Location
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col md:items-end text-sm text-slate-600 bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
+                    <p class="font-medium">Job Ref No: <span id="jd-ref" class="text-slate-800 font-bold">...</span></p>
+                    <p class="font-medium text-rose-600 flex items-center gap-1 mt-0.5">
+                        <i data-lucide="calendar-clock" class="w-4 h-4"></i> Closing Date: <span id="jd-closing">...</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2. Action/Nav Bar (Mimicking Topjobs layout but modern) -->
+            <div class="bg-white px-6 py-4 border-b border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-16 z-30 shadow-sm no-print">
+                
+                <!-- Left: Job Type Badge -->
+                <div class="w-full md:w-1/4 flex justify-start">
+                    <span id="jd-type" class="px-4 py-1.5 bg-rose-50 border border-rose-200 text-rose-700 font-bold text-sm rounded-lg shadow-sm">
+                        Full Time
+                    </span>
+                </div>
+
+                <!-- Center: Job Title -->
+                <div class="w-full md:w-2/4 text-center">
+                    <h1 id="jd-title" class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Job Title / Position</h1>
+                </div>
+
+                <!-- Right: Actions (Apply & Print) -->
+                <div class="w-full md:w-1/4 flex justify-end gap-2" id="action-buttons-top">
+                    <!-- Buttons dynamically injected via JS based on application method -->
+                </div>
+            </div>
+
+            <!-- 3. Main Content (Artwork / Summary) -->
+            <div class="p-6 md:p-10 bg-slate-100 flex flex-col items-center justify-center min-h-[400px]">
+                
+                <!-- Artwork Image (Primary display if available) -->
+                <div id="artwork-container" class="w-full max-w-4xl bg-white p-2 md:p-4 rounded-xl shadow-md border border-gray-200 mb-8 hidden">
+                    <img id="jd-artwork" src="" alt="Vacancy Advertisement" class="w-full h-auto rounded-lg">
+                </div>
+
+                <!-- Text Summary (Fallback or supplementary text) -->
+                <div class="w-full max-w-4xl bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-200 text-left">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                        <i data-lucide="align-left" class="w-5 h-5 text-rose-600"></i> Vacancy Overview
+                    </h3>
+                    <div id="jd-summary" class="text-slate-700 whitespace-pre-wrap leading-relaxed text-sm md:text-base font-medium">
+                        Job description will load here...
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 4. Bottom Bar (Repeat Apply Button) -->
+            <div class="bg-white px-6 py-4 border-t border-gray-200 flex justify-center md:justify-end items-center gap-4 bg-slate-50 no-print" id="action-buttons-bottom">
+                <!-- Same buttons as top will be cloned here via JS -->
+            </div>
+            
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdnx9qQBFtmV7JiGmgaBvjojwoC3tuue8",
+            authDomain: "akrich-training-and-solutions.firebaseapp.com",
+            projectId: "akrich-training-and-solutions",
+            storageBucket: "akrich-training-and-solutions.firebasestorage.app",
+            messagingSenderId: "440525254168",
+            appId: "1:440525254168:web:c5c3112e486cc9bd111d6d"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        lucide.createIcons();
+
+        // 1. Get Job ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const jobId = urlParams.get('id');
+
+        async function fetchJobDetails() {
+            if (!jobId) {
+                showError();
+                return;
+            }
+
+            try {
+                // Fetching from 'vacancies' collection
+                const docRef = doc(db, "vacancies", jobId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists() && (docSnap.data().status === 'active' || docSnap.data().status === 'approved')) {
+                    const job = docSnap.data();
+                    renderJob(job, docSnap.id);
+                } else {
+                    showError();
+                }
+            } catch (error) {
+                console.error("Error fetching job details:", error);
+                showError();
+            }
+        }
+
+        function renderJob(job, id) {
+            // Hide loading, show content
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('job-content').classList.remove('hidden');
+
+            // Header Section
+            document.getElementById('jd-company').innerText = job.companyName || job.company || "Company Confidential";
+            document.getElementById('jd-location').innerHTML = `<i data-lucide="map-pin" class="w-4 h-4"></i> ${job.district || ''}, ${job.country || 'Sri Lanka'}`;
+            
+            // Generate a short Ref ID from the Firebase document ID (first 7 chars)
+            document.getElementById('jd-ref').innerText = id.substring(0, 7).toUpperCase();
+            
+            // Calculate Closing Date (Assuming 14 days from creation date as per topAd package)
+            if (job.createdAt) {
+                const createdDate = new Date(job.createdAt);
+                createdDate.setDate(createdDate.getDate() + 14); 
+                document.getElementById('jd-closing').innerText = createdDate.toLocaleDateString('en-GB');
+            } else {
+                document.getElementById('jd-closing').innerText = "Not Specified";
+            }
+
+            // Nav Bar Section
+            document.getElementById('jd-type').innerText = job.jobType || "Full Time";
+            document.getElementById('jd-title').innerText = job.title || job.position || "Position Unavailable";
+            
+            // Content Section
+            document.getElementById('jd-summary').innerText = job.vacancySummary || "No detailed description provided.";
+
+            if (job.artworkUrl) {
+                document.getElementById('artwork-container').classList.remove('hidden');
+                document.getElementById('jd-artwork').src = job.artworkUrl;
+            }
+
+            // Application Buttons Logic (Dynamic based on Admin selection)
+            let applyButtonHtml = '';
+            
+            if (job.applicationMethod === 'Via Email' && job.destinationEmail) {
+                const subject = encodeURIComponent(`Job Application: ${job.position} (Ref: ${id.substring(0,7).toUpperCase()})`);
+                applyButtonHtml = `
+                    <a href="mailto:${job.destinationEmail}?subject=${subject}" class="inline-flex items-center gap-2 px-6 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 shadow-sm transition-colors text-sm">
+                        <i data-lucide="mail" class="w-4 h-4"></i> Apply by email
+                    </a>
+                `;
+            } 
+            else if (job.applicationMethod === 'Via Link' && job.applicationLink) {
+                applyButtonHtml = `
+                    <a href="${job.applicationLink}" target="_blank" class="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-sm transition-colors text-sm">
+                        <i data-lucide="external-link" class="w-4 h-4"></i> Apply via Website
+                    </a>
+                `;
+            }
+            else if (job.applicationMethod === 'Walk-in') {
+                applyButtonHtml = `
+                    <button class="inline-flex items-center gap-2 px-6 py-2 bg-amber-600 text-white font-bold rounded-lg cursor-default shadow-sm text-sm">
+                        <i data-lucide="footprints" class="w-4 h-4"></i> Walk-in Interviews
+                    </button>
+                `;
+            }
+
+            // Print Button
+            const printButtonHtml = `
+                <button onclick="window.print()" class="inline-flex items-center gap-2 px-4 py-2 bg-rose-700 text-white font-bold rounded-lg hover:bg-rose-800 shadow-sm transition-colors text-sm">
+                    <i data-lucide="printer" class="w-4 h-4"></i> Print
+                </button>
+            `;
+
+            // Inject buttons to top and bottom bars
+            document.getElementById('action-buttons-top').innerHTML = applyButtonHtml + printButtonHtml;
+            
+            // Only inject Apply button to bottom bar (printing from bottom is rare)
+            document.getElementById('action-buttons-bottom').innerHTML = applyButtonHtml;
+
+            // Re-initialize icons for dynamically added elements
+            lucide.createIcons();
+        }
+
+        function showError() {
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('error-state').classList.remove('hidden');
+        }
+
+        // Start execution
+        fetchJobDetails();
+
+    </script>
+</body>
+</html>
