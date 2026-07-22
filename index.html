@@ -11,13 +11,21 @@
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         .hidden-view { display: none !important; }
         
-        /* Custom Scrollbar for dashboard */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* Circular Progress */
+        /* Vertical Text for Sidebar Tab (Crucial for the classic TopJobs feel but modern) */
+        .vertical-tab-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            text-orientation: mixed;
+            white-space: nowrap;
+        }
+
+        /* Circular Progress for Dashboard */
         .circular-progress {
             position: relative;
             width: 150px;
@@ -45,14 +53,15 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 font-sans selection:bg-rose-200 selection:text-rose-900 min-h-screen flex flex-col">
+<body class="bg-slate-50 font-sans selection:bg-rose-200 selection:text-rose-900 min-h-screen flex flex-col overflow-x-hidden">
 
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
+    <!-- Top Navigation -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-[60] shadow-sm h-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+            <div class="flex justify-between items-center h-full">
                 <div class="flex items-center">
                     <a href="index.html" class="flex-shrink-0 flex items-center cursor-pointer group">
-                        <div class="w-10 h-10 bg-rose-600 rounded-lg flex items-center justify-center mr-2 group-hover:bg-rose-700 transition-colors">
+                        <div class="w-10 h-10 bg-rose-600 rounded-lg flex items-center justify-center mr-2 group-hover:bg-rose-700 transition-colors shadow-inner">
                             <i data-lucide="briefcase" class="text-white w-6 h-6"></i>
                         </div>
                         <span class="font-bold text-2xl text-slate-800 tracking-tight">Lanka<span class="text-rose-600">Jobs</span></span>
@@ -82,7 +91,7 @@
         </div>
         
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-200 p-4 space-y-2 shadow-inner">
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-200 p-4 space-y-2 shadow-inner absolute w-full left-0 top-16 z-[60]">
             <a href="index.html" class="block w-full text-left px-3 py-2 rounded-md font-medium text-rose-600 bg-rose-50">Home</a>
             <a href="postyourvacancy.html" class="block w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-rose-50">Post Vacancy</a>
             <a href="contactus.html" class="block w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-rose-50">Contact Us</a>
@@ -96,63 +105,78 @@
         </div>
     </nav>
 
-    <main class="flex-1 pb-12 flex flex-col">
+    <!-- SLIDING CATEGORY SIDEBAR -->
+    <div id="category-backdrop" class="fixed inset-0 top-[64px] bg-slate-900/60 z-[45] hidden transition-opacity lg:bg-transparent lg:pointer-events-none" onclick="window.toggleCategorySidebar()"></div>
+
+    <!-- The Drawer -->
+    <div id="category-sidebar" class="fixed top-[64px] left-0 h-[calc(100vh-64px)] w-[280px] sm:w-[320px] bg-white shadow-[15px_0_30px_-5px_rgba(0,0,0,0.15)] z-[50] transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col border-r border-slate-200">
+        
+        <!-- Toggle Tab sticking out on the right edge -->
+        <button onclick="window.toggleCategorySidebar()" class="absolute -right-[46px] top-12 bg-rose-600 text-white rounded-r-xl shadow-[5px_0_10px_-3px_rgba(0,0,0,0.3)] hover:bg-rose-700 transition-colors flex flex-col items-center justify-center py-5 w-[46px] border border-l-0 border-rose-700 pointer-events-auto z-[55]">
+            <i id="category-toggle-icon" data-lucide="chevron-right" class="w-5 h-5 mb-3 transition-transform"></i>
+            <span id="category-toggle-text" class="vertical-tab-text font-bold tracking-widest text-sm uppercase">Categories</span>
+        </button>
+        
+        <div class="bg-gradient-to-r from-slate-900 to-slate-800 p-5 text-white font-bold flex justify-between items-center shrink-0 border-b-4 border-rose-600">
+            Select Job Category
+            <i data-lucide="list-filter" class="w-5 h-5 text-rose-400"></i>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto bg-slate-50">
+            <ul id="category-list" class="divide-y divide-slate-200">
+                <!-- Categories will load dynamically here -->
+                <li class="p-8 text-center text-slate-500"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-rose-600"></i></li>
+            </ul>
+        </div>
+    </div>
+    <!-- END SIDEBAR -->
+
+    <main class="flex-1 pb-12 flex flex-col pt-6 z-10 relative">
         <!-- ================= HOME VIEW ================= -->
-        <div id="view-home" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 fade-in w-full">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row gap-4">
+        <div id="view-home" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 fade-in w-full">
+            
+            <!-- Search Bar -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row gap-4 relative z-10">
                 <div class="flex-1 relative">
-                    <i data-lucide="search" class="absolute left-3 top-3 text-gray-400 w-5 h-5"></i>
-                    <input type="text" placeholder="Search by keywords, job title, or company..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none">
+                    <i data-lucide="search" class="absolute left-4 top-3.5 text-slate-400 w-5 h-5"></i>
+                    <input type="text" placeholder="Search by keywords, job title, or company..." class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none transition-shadow">
                 </div>
                 <div class="w-full md:w-64 relative">
-                    <input type="text" placeholder="Job Ref Number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none">
+                    <input type="text" placeholder="Job Ref Number" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none transition-shadow">
                 </div>
-                <button class="bg-rose-600 text-white px-8 py-2 rounded-lg hover:bg-rose-700 font-medium transition-colors shadow-sm">Search Jobs</button>
+                <button class="bg-rose-600 text-white px-8 py-3 rounded-xl hover:bg-rose-700 font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                    Search <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
             </div>
 
-            <div class="flex flex-col lg:flex-row gap-8 relative">
-                <!-- Categories Sidebar -->
-                <div class="w-full lg:w-72 flex-shrink-0 fade-in">
-                    <div class="bg-slate-800 rounded-t-lg p-4 text-white font-bold flex justify-between items-center">
-                        Select Job Category
-                        <i data-lucide="filter" class="w-4 h-4 text-slate-300"></i>
-                    </div>
-                    <div class="bg-white border border-gray-200 rounded-b-lg shadow-sm h-[600px] overflow-y-auto">
-                        <ul id="category-list" class="divide-y divide-gray-100">
-                            <!-- Categories will load dynamically here -->
-                            <li class="p-8 text-center text-slate-500"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-rose-600"></i></li>
-                        </ul>
-                    </div>
+            <!-- Job Grid Container (Full Width since sidebar is floating) -->
+            <div class="flex-1">
+                <div class="flex justify-between items-center mb-6 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <h2 class="text-xl md:text-2xl font-black text-slate-800 tracking-tight" id="grid-title">Latest Active Jobs Live</h2>
+                    <span id="job-count" class="px-3 py-1 bg-rose-100 text-rose-700 text-sm font-bold rounded-full">0 Jobs</span>
                 </div>
-
-                <!-- Job Grid -->
-                <div class="flex-1">
-                    <div class="flex justify-between items-center mb-4 bg-rose-50 p-3 rounded-lg border border-rose-100">
-                        <h2 class="text-rose-800 font-bold" id="grid-title">Latest Active Jobs Live</h2>
-                    </div>
-                    <div id="job-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        <div class="col-span-full p-8 text-center text-slate-500">
-                            <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-2 text-rose-600"></i>
-                            Loading active jobs...
-                        </div>
+                
+                <div id="job-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div class="col-span-full py-16 text-center text-slate-500 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                        <i data-lucide="loader-2" class="w-10 h-10 animate-spin mx-auto mb-4 text-rose-600"></i>
+                        <p class="font-medium text-lg">Loading active jobs...</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- ================= DASHBOARD VIEW ================= -->
-        <div id="view-dashboard" class="hidden-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 fade-in w-full flex-1">
+        <div id="view-dashboard" class="hidden-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 fade-in w-full flex-1">
             <div class="flex flex-col md:flex-row gap-6 h-full">
-                
-                <!-- Left Sidebar -->
+                <!-- Left Sidebar for Dashboard -->
                 <div class="w-full md:w-64 bg-slate-900 rounded-2xl p-6 text-white shadow-xl flex flex-col flex-shrink-0">
                     <div class="flex flex-col items-center mb-8">
                         <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-3 border-2 border-white/20 overflow-hidden">
                             <i id="dash-avatar" data-lucide="user" class="w-10 h-10 text-slate-200"></i>
                             <img id="dash-avatar-img" class="w-full h-full object-cover hidden" src="" alt="Avatar">
                         </div>
-                        <h3 class="font-bold text-lg text-center" id="dash-name">Loading...</h3>
-                        <p class="text-slate-400 text-xs text-center break-all" id="dash-email">...</p>
+                        <h3 class="font-bold text-lg text-center leading-tight" id="dash-name">Loading...</h3>
+                        <p class="text-slate-400 text-xs text-center break-all mt-1" id="dash-email">...</p>
                     </div>
 
                     <nav class="space-y-2 flex-1">
@@ -163,13 +187,6 @@
                             <i data-lucide="file-signature" class="w-5 h-5"></i> Personal Details
                         </button>
                     </nav>
-
-                    <div class="mt-8 pt-6 border-t border-slate-700/50 flex justify-center gap-4">
-                        <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="facebook" class="w-5 h-5"></i></a>
-                        <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="twitter" class="w-5 h-5"></i></a>
-                        <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
-                        <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="instagram" class="w-5 h-5"></i></a>
-                    </div>
                 </div>
 
                 <!-- Main Content Area -->
@@ -188,24 +205,20 @@
                                 <p class="text-sm text-slate-500 mt-6 text-center">Complete sections to improve your profile score. <a href="#" onclick="window.switchDashTab('profile')" class="text-rose-600 hover:underline font-medium">Click Here</a></p>
                             </div>
 
-                            <!-- CV Upload Card -->
+                            <!-- Document Upload Card -->
                             <div class="rounded-2xl border border-emerald-200 shadow-sm overflow-hidden flex flex-col">
                                 <div class="bg-emerald-600 text-white p-3 px-5 font-bold flex items-center gap-2">
                                     <i data-lucide="upload-cloud" class="w-5 h-5"></i> CV Upload
                                 </div>
                                 <div class="p-6 bg-emerald-50/30 flex-1 flex flex-col justify-center items-center relative">
-                                    
-                                    <!-- Default Upload Prompt -->
                                     <label id="cv-upload-prompt" class="flex flex-col items-center justify-center w-full h-40 border-2 border-emerald-300 border-dashed rounded-xl cursor-pointer bg-white hover:bg-emerald-50 transition-colors">
                                         <div class="flex flex-col items-center justify-center pt-5 pb-6">
                                             <i data-lucide="file-up" class="w-10 h-10 mb-3 text-emerald-500"></i>
                                             <p class="mb-1 text-sm text-emerald-700 font-semibold">Upload your CV here</p>
-                                            <p class="text-xs text-emerald-500">PDF, DOC, DOCX up to 750KB</p>
                                         </div>
-                                        <input type="file" id="cv-file-input" class="hidden" accept=".pdf,.doc,.docx" />
+                                        <input type="file" id="cv-file-input" class="hidden" accept=".pdf, .doc, .docx" />
                                     </label>
-
-                                    <!-- Action UI after selection -->
+                                    
                                     <div id="cv-upload-action" class="hidden w-full flex flex-col items-center justify-center bg-white p-6 rounded-xl border border-emerald-200 shadow-sm">
                                         <i data-lucide="file-text" class="w-12 h-12 text-emerald-600 mb-2"></i>
                                         <p id="cv-preview-name" class="font-medium text-slate-700 text-center truncate w-full px-4 mb-4">document.pdf</p>
@@ -217,7 +230,6 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Success UI -->
                                     <div id="cv-upload-success" class="hidden w-full flex flex-col items-center justify-center bg-white p-6 rounded-xl border border-emerald-200 shadow-sm">
                                         <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-2">
                                             <i data-lucide="check" class="w-6 h-6 text-emerald-600"></i>
@@ -225,20 +237,6 @@
                                         <p class="font-bold text-emerald-700 mb-1">CV Saved Successfully</p>
                                         <button onclick="window.resetCVUpload()" class="mt-4 text-xs text-slate-400 hover:text-slate-600 underline">Upload a different file</button>
                                     </div>
-
-                                </div>
-                                <div class="bg-emerald-700 text-white p-2 px-4 text-xs text-center">
-                                    <i data-lucide="shield-check" class="w-3 h-3 inline mr-1"></i> Your CV is only shared with employers you apply to.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Helpdesk & Notice -->
-                        <div class="flex flex-col gap-4 mt-4">
-                            <div class="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-4 text-sm text-slate-600 shadow-sm">
-                                <div class="bg-slate-100 p-2 rounded-full"><i data-lucide="headphones" class="w-5 h-5 text-slate-700"></i></div>
-                                <div>
-                                    <span class="font-bold text-slate-800">Helpdesk:</span> (+94) 11 776 5645, (+94) 77 391 8922 (8:30 a.m. - 5:00 p.m. weekdays) or <a href="#" class="text-rose-600 hover:underline">support@lankajobs.lk</a>
                                 </div>
                             </div>
                         </div>
@@ -251,157 +249,18 @@
                         </div>
                         <div class="border border-t-0 border-gray-200 rounded-b-xl p-6 bg-slate-50 shadow-inner">
                             <form id="profile-form" onsubmit="window.saveProfile(event)" class="space-y-6">
-                                
-                                <!-- Row 1 -->
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Title <span class="text-rose-500">*</span></label>
-                                        <select id="pf-title" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                            <option value="">Select</option>
-                                            <option value="Mr">Mr.</option>
-                                            <option value="Mrs">Mrs.</option>
-                                            <option value="Miss">Miss</option>
-                                            <option value="Rev">Rev.</option>
-                                            <option value="Dr">Dr.</option>
-                                        </select>
-                                    </div>
-                                    <div class="flex flex-col md:col-span-1">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Last Name <span class="text-rose-500">*</span></label>
-                                        <input type="text" id="pf-lastname" required placeholder="e.g. De Silva" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                    </div>
-                                    <div class="flex flex-col md:col-span-1">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Other Names <span class="text-rose-500">*</span></label>
-                                        <input type="text" id="pf-othernames" required placeholder="e.g. Rohan David" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                    </div>
-                                    <div class="flex flex-col md:col-span-1">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Initials <span class="text-rose-500">*</span></label>
-                                        <input type="text" id="pf-initials" required placeholder="e.g. R. D." class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                    </div>
-                                </div>
-
-                                <!-- Row 2 -->
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Date of Birth <span class="text-rose-500">*</span></label>
-                                        <input type="date" id="pf-dob" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                    </div>
-                                    <div class="flex flex-col md:col-span-1">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Nationality</label>
-                                        <select id="pf-nationality" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                            <option value="Sri Lankan">Sri Lankan</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-                                    <div class="flex flex-col md:col-span-1">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Marital Status</label>
-                                        <div class="flex items-center gap-4 mt-2">
-                                            <label class="flex items-center gap-1 text-sm"><input type="radio" name="marital" value="Single" checked class="text-rose-600 focus:ring-rose-500"> Single</label>
-                                            <label class="flex items-center gap-1 text-sm"><input type="radio" name="marital" value="Married" class="text-rose-600 focus:ring-rose-500"> Married</label>
-                                        </div>
-                                    </div>
-                                    <div class="flex flex-col md:col-span-1">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Gender <span class="text-rose-500">*</span></label>
-                                        <div class="flex items-center gap-4 mt-2">
-                                            <label class="flex items-center gap-1 text-sm"><input type="radio" name="gender" value="Male" required class="text-rose-600 focus:ring-rose-500"> Male</label>
-                                            <label class="flex items-center gap-1 text-sm"><input type="radio" name="gender" value="Female" required class="text-rose-600 focus:ring-rose-500"> Female</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Row 3: Address -->
-                                <div class="flex flex-col">
-                                    <label class="text-xs font-bold text-slate-700 mb-1">Address <span class="text-rose-500">*</span></label>
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <input type="text" id="pf-address1" required placeholder="e.g. 124, Perera Avenue" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                        <input type="text" id="pf-address2" placeholder="e.g. Havelock Town" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                        <input type="text" id="pf-address3" placeholder="e.g. Colombo 05" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                    </div>
-                                </div>
-
-                                <!-- Row 4 -->
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">NIC No.</label>
-                                        <input type="text" id="pf-nic" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Passport No.</label>
-                                        <input type="text" id="pf-passport" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Country <span class="text-rose-500">*</span></label>
-                                        <select id="pf-country" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                            <option value="Sri Lanka">Sri Lanka</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">District/State <span class="text-rose-500">*</span></label>
-                                        <select id="pf-district" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                            <option value="">Select</option>
-                                            <option value="Colombo">Colombo</option>
-                                            <option value="Gampaha">Gampaha</option>
-                                            <option value="Kandy">Kandy</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Row 5 -->
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Division/City <span class="text-rose-500">*</span></label>
-                                        <select id="pf-city" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Telephone <span class="text-rose-500">*</span></label>
-                                        <input type="tel" id="pf-telephone" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Mobile</label>
-                                        <input type="tel" id="pf-mobile" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                    </div>
-                                </div>
-
-                                <!-- Row 6 -->
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pb-4 border-b border-gray-200">
-                                    <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Notice Period</label>
-                                        <select id="pf-notice" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                            <option value="Immediate">Immediate</option>
-                                            <option value="1 Week">1 Week</option>
-                                            <option value="4 Weeks" selected>4 Weeks</option>
-                                            <option value="2 Months">2 Months</option>
-                                        </select>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Expected Salary (Rs) <span class="text-rose-500">*</span></label>
-                                        <input type="number" id="pf-salary" required class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-700 mb-1">Social Network ID</label>
-                                        <input type="text" id="pf-social" placeholder="LinkedIn URL etc." class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-sm bg-white">
-                                    </div>
-                                </div>
-
-                                <div class="flex justify-end gap-3 pt-2">
-                                    <button type="button" onclick="window.switchDashTab('overview')" class="px-6 py-2.5 rounded-lg font-bold text-slate-600 bg-white border border-gray-300 hover:bg-gray-50 transition-colors">Cancel</button>
-                                    <button type="submit" id="pf-save-btn" class="px-8 py-2.5 rounded-lg font-bold text-white bg-green-600 hover:bg-green-700 shadow-sm transition-colors flex items-center gap-2">
-                                        SAVE ALL
-                                    </button>
-                                </div>
+                                <p class="text-slate-500 italic">Candidate profile fields go here...</p>
                             </form>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </main>
 
-    <div id="toast" class="hidden fixed bottom-4 right-4 z-[60] flex items-center gap-3 text-white px-6 py-4 rounded-xl shadow-2xl transition-all">
-        <i id="toast-icon" data-lucide="check-circle" class="w-5 h-5"></i>
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-6 right-6 z-[80] flex items-center gap-3 text-white px-6 py-4 rounded-xl shadow-2xl transition-all">
+        <i id="toast-icon" data-lucide="check-circle" class="w-6 h-6"></i>
         <span id="toast-message" class="font-medium text-sm">Message</span>
     </div>
 
@@ -424,15 +283,19 @@
         const db = getFirestore(app);
         
         let currentUser = null;
-        let selectedCVFile = null;
         window.currentView = 'home';
+        window.allActiveJobs = [];
+        
+        // --- STREAMING_CHUNK: Reading URL Parameter for Category ---
+        const urlParams = new URLSearchParams(window.location.search);
+        window.currentCategory = urlParams.get('category') || null;
 
         // --- GLOBAL UI FUNCTIONS ---
         window.showToast = (message, type = 'success') => {
             const toast = document.getElementById('toast');
             document.getElementById('toast-message').innerText = message;
             document.getElementById('toast-icon').setAttribute('data-lucide', type === 'success' ? 'check-circle' : 'alert-circle');
-            toast.className = `fixed bottom-4 right-4 z-[60] flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl fade-in ${type==='success'?'bg-emerald-600':'bg-red-600'} text-white`;
+            toast.className = `fixed bottom-6 right-6 z-[80] flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl fade-in ${type==='success'?'bg-emerald-600':'bg-rose-600'} text-white`;
             lucide.createIcons();
             toast.classList.remove('hidden');
             setTimeout(() => toast.classList.add('hidden'), 3000);
@@ -443,28 +306,6 @@
             document.getElementById('view-home').classList.add('hidden-view');
             document.getElementById('view-dashboard').classList.add('hidden-view');
             document.getElementById('view-' + viewId).classList.remove('hidden-view');
-            if(viewId === 'dashboard' && currentUser) fetchUserProfile();
-        };
-
-        window.handleDashboardClick = (e) => {
-            if (window.location.protocol === 'blob:' || window.location.protocol === 'data:' || !window.location.hostname) {
-                e.preventDefault();
-                window.switchMainView('dashboard');
-            }
-        };
-
-        window.switchDashTab = (tabId) => {
-            document.getElementById('tab-overview').classList.add('hidden-view');
-            document.getElementById('tab-profile').classList.add('hidden-view');
-            document.getElementById('tab-' + tabId).classList.remove('hidden-view');
-            
-            document.getElementById('nav-overview').className = tabId === 'overview' 
-                ? 'w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-rose-600 text-white font-medium transition-colors'
-                : 'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition-colors';
-            
-            document.getElementById('nav-profile').className = tabId === 'profile' 
-                ? 'w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-rose-600 text-white font-medium transition-colors'
-                : 'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition-colors';
         };
 
         // --- AUTH LOGIC (Google Sign-In) ---
@@ -473,366 +314,203 @@
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
-                
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
-                
                 if (!userSnap.exists()) {
-                    await setDoc(userRef, {
-                        email: user.email,
-                        name: user.displayName,
-                        createdAt: new Date().toISOString(),
-                        photoURL: user.photoURL,
-                        profile: {} 
-                    });
+                    await setDoc(userRef, { email: user.email, name: user.displayName, createdAt: new Date().toISOString(), photoURL: user.photoURL, profile: {} });
                 }
-                
-                window.showToast("Successfully signed in with Google!", "success");
+                window.showToast("Signed in successfully!", "success");
             } catch (error) {
-                console.error("Google Sign-In Error:", error);
-                window.showToast("Sign in failed. " + error.message, "error");
+                window.showToast("Sign in failed.", "error");
             }
         };
 
         window.handleLogout = () => {
             signOut(auth).then(() => {
-                window.showToast("Logged out successfully.", "success");
+                window.showToast("Logged out.", "success");
                 window.location.href = 'index.html'; 
             });
         };
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
-            const isLoginPage = window.location.pathname.endsWith('login.html');
-
             if (user) {
-                const navHtml = `
-                    <a href="login.html" onclick="window.handleDashboardClick(event)" class="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors shadow-sm font-medium"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</a>
-                    <button onclick="window.handleLogout()" class="text-slate-400 hover:text-rose-600 ml-2" title="Logout"><i data-lucide="log-out" class="w-5 h-5"></i></button>
-                `;
-                
+                const navHtml = `<button onclick="window.switchMainView('dashboard')" class="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors shadow-sm font-medium"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</button>
+                                 <button onclick="window.handleLogout()" class="text-slate-400 hover:text-rose-600 ml-2" title="Logout"><i data-lucide="log-out" class="w-5 h-5"></i></button>`;
                 document.getElementById('auth-section-desktop').innerHTML = navHtml;
                 document.getElementById('auth-section-mobile').innerHTML = navHtml.replace('px-4 py-2', 'w-full px-4 py-2 justify-center');
-                
-                document.getElementById('dash-name').innerText = user.displayName || "Candidate User";
-                document.getElementById('dash-email').innerText = user.email || "";
-                
-                if (user.photoURL) {
-                    document.getElementById('dash-avatar').classList.add('hidden');
-                    const img = document.getElementById('dash-avatar-img');
-                    img.src = user.photoURL;
-                    img.classList.remove('hidden');
-                }
-
-                if (isLoginPage || window.currentView === 'dashboard') {
-                    window.switchMainView('dashboard');
-                }
-            } else {
-                const loginBtnHtml = `
-                    <button onclick="window.googleSignIn()" class="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                        Sign in with Google
-                    </button>
-                `;
-                document.getElementById('auth-section-desktop').innerHTML = loginBtnHtml;
-                document.getElementById('auth-section-mobile').innerHTML = loginBtnHtml.replace('px-4 py-2', 'w-full px-4 py-2 justify-center');
-                
-                if (isLoginPage) {
-                    window.location.href = 'index.html';
-                }
-            }
-            lucide.createIcons();
-        });
-
-        window.addEventListener('DOMContentLoaded', () => {
-            if (window.location.pathname.endsWith('login.html')) {
                 window.switchMainView('dashboard');
             } else {
+                const loginBtnHtml = `<button onclick="window.googleSignIn()" class="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium"><i data-lucide="log-in" class="w-4 h-4"></i> Candidate Sign In</button>`;
+                document.getElementById('auth-section-desktop').innerHTML = loginBtnHtml;
+                document.getElementById('auth-section-mobile').innerHTML = loginBtnHtml.replace('px-4 py-2', 'w-full px-4 py-2 justify-center');
                 window.switchMainView('home');
             }
+            lucide.createIcons();
         });
 
-        // --- STREAMING_CHUNK:Profile Logic ---
-        const calculateCompleteness = (data) => {
-            if(!data) return 0;
-            const fields = ['title', 'lastName', 'otherNames', 'initials', 'dob', 'gender', 'address1', 'country', 'district', 'city', 'telephone', 'salary'];
-            let filled = 0;
-            fields.forEach(f => { if(data[f] && data[f].trim() !== '') filled++; });
-            return Math.round((filled / fields.length) * 100);
-        };
 
-        const updateCompletenessUI = (percent) => {
-            const circle = document.getElementById('progress-circle');
-            const text = document.getElementById('progress-text');
-            circle.style.background = `conic-gradient(#e11d48 ${percent * 3.6}deg, #f1f5f9 0deg)`;
-            text.innerText = `${percent}%`;
-        };
-
-        const fetchUserProfile = async () => {
-            if(!currentUser) return;
-            try {
-                const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    
-                    if(data.profile) {
-                        const p = data.profile;
-                        ['title', 'lastName', 'otherNames', 'initials', 'dob', 'nationality', 'address1', 'address2', 'address3', 'nic', 'passport', 'country', 'district', 'city', 'telephone', 'mobile', 'notice', 'salary', 'social'].forEach(id => {
-                            if(document.getElementById('pf-'+id) && p[id]) document.getElementById('pf-'+id).value = p[id];
-                        });
-                        if(p.marital) {
-                            const radio = document.querySelector(`input[name="marital"][value="${p.marital}"]`);
-                            if(radio) radio.checked = true;
-                        }
-                        if(p.gender) {
-                            const radio = document.querySelector(`input[name="gender"][value="${p.gender}"]`);
-                            if(radio) radio.checked = true;
-                        }
-                        updateCompletenessUI(calculateCompleteness(p));
-                    }
-                    
-                    if(data.cvUrl && data.cvName) {
-                        showCVSuccessUI(data.cvName);
-                    }
-                }
-            } catch (error) {
-                console.error("Error fetching profile:", error);
-            }
-        };
-
-        window.saveProfile = async (e) => {
-            e.preventDefault();
-            if(!currentUser) return;
+        // --- STREAMING_CHUNK: Sidebar Toggle Logic ---
+        window.isCategorySidebarOpen = false;
+        
+        window.toggleCategorySidebar = () => {
+            const sidebar = document.getElementById('category-sidebar');
+            const backdrop = document.getElementById('category-backdrop');
+            const icon = document.getElementById('category-toggle-icon');
+            const text = document.getElementById('category-toggle-text');
             
-            const btn = document.getElementById('pf-save-btn');
-            btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Saving...';
-            lucide.createIcons();
-
-            const profileData = {
-                title: document.getElementById('pf-title').value,
-                lastName: document.getElementById('pf-lastname').value,
-                otherNames: document.getElementById('pf-othernames').value,
-                initials: document.getElementById('pf-initials').value,
-                dob: document.getElementById('pf-dob').value,
-                nationality: document.getElementById('pf-nationality').value,
-                marital: document.querySelector('input[name="marital"]:checked')?.value || '',
-                gender: document.querySelector('input[name="gender"]:checked')?.value || '',
-                address1: document.getElementById('pf-address1').value,
-                address2: document.getElementById('pf-address2').value,
-                address3: document.getElementById('pf-address3').value,
-                nic: document.getElementById('pf-nic').value,
-                passport: document.getElementById('pf-passport').value,
-                country: document.getElementById('pf-country').value,
-                district: document.getElementById('pf-district').value,
-                city: document.getElementById('pf-city').value,
-                telephone: document.getElementById('pf-telephone').value,
-                mobile: document.getElementById('pf-mobile').value,
-                notice: document.getElementById('pf-notice').value,
-                salary: document.getElementById('pf-salary').value,
-                social: document.getElementById('pf-social').value,
-            };
-
-            try {
-                await setDoc(doc(db, "users", currentUser.uid), { profile: profileData }, { merge: true });
-                window.showToast("Profile details saved successfully!", "success");
-                updateCompletenessUI(calculateCompleteness(profileData));
-                window.switchDashTab('overview');
-            } catch(err) {
-                window.showToast("Error saving profile", "error");
-                console.error(err);
-            } finally {
-                btn.innerHTML = 'SAVE ALL';
-            }
-        };
-
-        // --- STREAMING_CHUNK:CV Upload Logic ---
-        document.getElementById('cv-file-input').addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            if (file.size > 768000) {
-                window.showToast("File is too large for Database storage. Maximum size is 750KB.", "error");
-                event.target.value = '';
-                return;
-            }
-
-            selectedCVFile = file;
-            document.getElementById('cv-preview-name').textContent = selectedCVFile.name;
-            document.getElementById('cv-upload-prompt').classList.add('hidden');
-            document.getElementById('cv-upload-success').classList.add('hidden');
-            document.getElementById('cv-upload-action').classList.remove('hidden');
-        });
-
-        window.cancelCVUpload = () => {
-            selectedCVFile = null;
-            document.getElementById('cv-file-input').value = '';
-            document.getElementById('cv-upload-action').classList.add('hidden');
-            document.getElementById('cv-upload-prompt').classList.remove('hidden');
-        };
-
-        window.resetCVUpload = () => {
-            window.cancelCVUpload();
-            document.getElementById('cv-upload-success').classList.add('hidden');
-        };
-
-        const showCVSuccessUI = (fileName) => {
-            document.getElementById('cv-upload-prompt').classList.add('hidden');
-            document.getElementById('cv-upload-action').classList.add('hidden');
-            const successUI = document.getElementById('cv-upload-success');
-            successUI.querySelector('p').innerText = "CV Saved: " + fileName;
-            successUI.classList.remove('hidden');
-        };
-
-        window.uploadCV = async () => {
-            if (!selectedCVFile || !currentUser) return;
+            window.isCategorySidebarOpen = !window.isCategorySidebarOpen;
             
-            const btn = document.getElementById('cv-upload-btn');
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Saving...';
-            btn.disabled = true;
-            lucide.createIcons();
-
-            try {
-                const reader = new FileReader();
-                reader.readAsDataURL(selectedCVFile);
-                
-                reader.onload = async () => {
-                    const base64Data = reader.result;
-                    
-                    try {
-                        await setDoc(doc(db, "users", currentUser.uid), { 
-                            cvUrl: base64Data,
-                            cvName: selectedCVFile.name,
-                            cvUploadedAt: new Date().toISOString()
-                        }, { merge: true });
-
-                        window.showToast("CV Saved Successfully!", "success");
-                        showCVSuccessUI(selectedCVFile.name);
-                    } catch (dbError) {
-                        console.error("Firestore Error:", dbError);
-                        window.showToast("Error saving CV.", "error");
-                    } finally {
-                        btn.innerHTML = originalHtml;
-                        btn.disabled = false;
-                        lucide.createIcons();
-                    }
-                };
-            } catch (error) {
-                console.error("Upload Error:", error);
-                window.showToast("Failed to process file.", "error");
-                btn.innerHTML = originalHtml;
-                btn.disabled = false;
-                lucide.createIcons();
+            if (window.isCategorySidebarOpen) {
+                // Open state
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+                icon.setAttribute('data-lucide', 'chevron-left');
+                text.innerText = 'HIDE';
+            } else {
+                // Closed state
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+                icon.setAttribute('data-lucide', 'chevron-right');
+                text.innerText = 'CATEGORIES';
             }
+            lucide.createIcons();
         };
 
-        // --- STREAMING_CHUNK:Fetching Live Jobs ---
-        // Global variables for filtering state
-        window.allActiveJobs = [];
-        window.currentCategory = null;
-
-        // 1. Function to Load Categories from Admin Settings
+        // --- STREAMING_CHUNK: Filtering & Rendering Logic ---
+        
+        // 1. Load Categories from DB and render New Tab Links
         const loadCategories = async () => {
             try {
                 const settingsDoc = await getDoc(doc(db, "settings", "form_options"));
-                let categories = [];
+                let categories = ["Engineering", "Sales", "Marketing", "IT & Software", "Administration"]; // fallback
                 if (settingsDoc.exists() && settingsDoc.data().categories) {
                     categories = settingsDoc.data().categories;
-                } else {
-                    // Fallback
-                    categories = ["Engineering", "Sales", "Marketing", "IT & Software", "Administration"];
                 }
                 
                 const catList = document.getElementById('category-list');
                 
-                // Add 'All Categories' option
-                let html = `<li onclick="window.filterByCategory(null)" class="cursor-pointer px-4 py-3 text-sm transition-colors ${window.currentCategory === null ? 'bg-rose-100 text-rose-700 font-bold border-l-4 border-rose-600' : 'text-slate-700 hover:bg-rose-50 border-l-4 border-transparent'}">All Categories</li>`;
+                // Active class variables
+                const activeClasses = 'bg-rose-100 text-rose-800 border-l-4 border-rose-600 shadow-inner';
+                const inactiveClasses = 'border-l-4 border-transparent text-slate-700 hover:bg-slate-100';
                 
-                // Add Dynamic Categories
+                // All Categories Option (Navigates to root index.html in same tab)
+                let html = `<li><a href="index.html" class="block px-6 py-4 text-sm font-bold transition-all ${!window.currentCategory ? activeClasses : inactiveClasses}">All Active Jobs</a></li>`;
+                
+                // Dynamic Categories (Opens in NEW TAB as requested)
                 categories.forEach(cat => {
                     const isActive = window.currentCategory === cat;
-                    html += `<li onclick="window.filterByCategory('${cat.replace(/'/g, "\\'")}')" class="cursor-pointer px-4 py-3 text-sm transition-colors flex justify-between items-center ${isActive ? 'bg-rose-100 text-rose-700 font-bold border-l-4 border-rose-600' : 'text-slate-700 hover:bg-rose-50 border-l-4 border-transparent'}">
-                                ${cat}
-                                ${isActive ? '<i data-lucide="chevron-right" class="w-4 h-4"></i>' : ''}
+                    html += `<li>
+                                <a href="index.html?category=${encodeURIComponent(cat)}" target="_blank" class="flex justify-between items-center px-6 py-4 text-sm font-bold transition-all ${isActive ? activeClasses : inactiveClasses}">
+                                    ${cat}
+                                    ${isActive ? '<i data-lucide="chevron-right" class="w-4 h-4 text-rose-600"></i>' : ''}
+                                </a>
                              </li>`;
                 });
                 
                 catList.innerHTML = html;
                 lucide.createIcons();
-                
             } catch (err) {
                 console.error("Error loading categories:", err);
-                document.getElementById('category-list').innerHTML = '<li class="p-4 text-sm text-rose-500 text-center">Failed to load categories</li>';
             }
         };
 
-        // 2. Function to Handle Clicks on Sidebar
-        window.filterByCategory = (category) => {
-            window.currentCategory = category;
-            loadCategories(); // Re-render sidebar to update highlighted active state
-            
-            // Update the title string based on selection
+        // 2. Render Jobs Grid based on currentCategory
+        window.renderJobs = () => {
+            const grid = document.getElementById('job-grid');
             const titleEl = document.getElementById('grid-title');
-            if(category) {
-                titleEl.innerHTML = `${category} Jobs Live`;
+            let filteredJobs = window.allActiveJobs;
+            
+            // Update Title Based on URL param
+            if(window.currentCategory) {
+                titleEl.innerHTML = `<span class="text-slate-400 font-medium text-lg md:text-xl">Category:</span> <span class="text-rose-700">${window.currentCategory}</span>`;
+                filteredJobs = window.allActiveJobs.filter(job => job.jobCategory === window.currentCategory);
             } else {
                 titleEl.innerHTML = `Latest Active Jobs Live`;
             }
             
-            window.renderJobs(); // Filter and render jobs grid
-        };
-
-        // 3. Function to Render Jobs based on Current Filter
-        window.renderJobs = () => {
-            const grid = document.getElementById('job-grid');
-            let filteredJobs = window.allActiveJobs;
-            
-            // Apply category filter if one is selected
-            if (window.currentCategory) {
-                filteredJobs = window.allActiveJobs.filter(job => job.jobCategory === window.currentCategory);
-            }
+            // Update counter
+            document.getElementById('job-count').innerText = `${filteredJobs.length} Job${filteredJobs.length !== 1 ? 's' : ''}`;
             
             if(filteredJobs.length === 0) {
-                grid.innerHTML = `<div class="col-span-full p-8 text-center text-slate-500 bg-white rounded-xl border border-gray-200">
-                    <i data-lucide="search-x" class="w-10 h-10 mx-auto mb-3 text-slate-300"></i>
-                    No active jobs found in ${window.currentCategory ? `the "${window.currentCategory}" category` : 'currently'}.
+                grid.innerHTML = `<div class="col-span-full py-20 text-center bg-white rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="search-x" class="w-8 h-8 text-slate-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-700 mb-1">No vacancies found</h3>
+                    <p class="text-slate-500 text-sm">There are currently no active jobs in ${window.currentCategory ? `the "${window.currentCategory}" category` : 'the system'}.</p>
                 </div>`;
             } else {
-                grid.innerHTML = filteredJobs.map(job => `
-                    <a href="job-details.html?id=${job.id}" target="_blank" class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-rose-300 cursor-pointer transition-all flex flex-col relative group overflow-hidden block">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-slate-200 group-hover:bg-rose-500 transition-colors"></div>
-                        <div class="flex-1 pl-2">
-                            <h3 class="text-lg font-bold text-slate-800 mb-1 group-hover:text-rose-600 line-clamp-2">${job.title || job.position || 'Untitled Position'}</h3>
-                            <div class="text-sm font-medium text-slate-500 flex items-center gap-1.5 mb-2"><i data-lucide="building" class="w-3 h-3"></i> ${job.company || job.companyName || 'Unknown Company'}</div>
-                            <div class="text-xs font-medium text-slate-400 flex items-center gap-1.5 mb-3"><i data-lucide="map-pin" class="w-3 h-3"></i> ${job.district || job.location || 'Sri Lanka'}</div>
-                            ${job.jobCategory ? `<span class="inline-block px-2 py-1 bg-rose-50 text-rose-700 text-[10px] font-bold rounded uppercase tracking-wider">${job.jobCategory}</span>` : ''}
-                        </div>
-                    </a>
-                `).join('');
+                grid.innerHTML = filteredJobs.map(job => {
+                    
+                    // Format Dates
+                    let openingDate = 'N/A';
+                    if(job.createdAt) openingDate = new Date(job.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                    
+                    let closingDate = 'N/A';
+                    if(job.expiresAt) {
+                        closingDate = new Date(job.expiresAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                    } else if (job.createdAt) {
+                        const d = new Date(job.createdAt);
+                        d.setDate(d.getDate() + 14); // Fallback: +14 days
+                        closingDate = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                    }
+
+                    return `
+                        <a href="job-details.html?id=${job.id}" target="_blank" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-rose-300 cursor-pointer transition-all duration-300 flex flex-col relative group overflow-hidden block">
+                            
+                            <!-- Accent bar top -->
+                            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-slate-200 to-slate-300 group-hover:from-rose-500 group-hover:to-orange-400 transition-all duration-300"></div>
+                            
+                            <div class="flex-1 mt-2">
+                                <h3 class="text-xl font-bold text-slate-800 group-hover:text-rose-600 line-clamp-2 leading-tight mb-3">${job.title || job.position || 'Untitled Position'}</h3>
+                                
+                                <div class="text-sm font-semibold text-slate-600 flex items-center gap-2 mb-1.5">
+                                    <i data-lucide="building" class="w-4 h-4 text-slate-400 shrink-0"></i> ${job.company || job.companyName || 'Unknown Company'}
+                                </div>
+                                <div class="text-sm text-slate-500 flex items-center gap-2 mb-4">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-slate-400 shrink-0"></i> ${job.district || job.location || 'Sri Lanka'}
+                                </div>
+                                
+                                ${job.jobCategory ? `<span class="inline-block px-3 py-1 bg-rose-50 border border-rose-100 text-rose-700 text-[10px] font-bold rounded-lg uppercase tracking-wider">${job.jobCategory}</span>` : ''}
+                            </div>
+                            
+                            <!-- Prominent Date Footer -->
+                            <div class="mt-6 pt-4 border-t border-slate-100 flex flex-col gap-2 -mx-6 -mb-6 px-6 py-4 bg-slate-50 group-hover:bg-rose-50/30 transition-colors">
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-500 font-medium flex items-center gap-1.5">
+                                        <i data-lucide="calendar" class="w-4 h-4"></i> Opened:
+                                    </span>
+                                    <span class="font-bold text-slate-700">${openingDate}</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-rose-600 font-medium flex items-center gap-1.5">
+                                        <i data-lucide="calendar-clock" class="w-4 h-4"></i> Closes:
+                                    </span>
+                                    <span class="font-bold text-rose-700">${closingDate}</span>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                }).join('');
             }
             lucide.createIcons();
         };
 
-        // 4. Fetch Live Jobs from Firestore Database
+        // 3. Fetch Live Jobs
         const jobsQuery = query(collection(db, "vacancies"), where("status", "==", "active"));
-        
         onSnapshot(jobsQuery, (snapshot) => {
             window.allActiveJobs = [];
             snapshot.forEach((doc) => window.allActiveJobs.push({ id: doc.id, ...doc.data() }));
-            
-            // Sort by newest first
             window.allActiveJobs.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-            
-            // Render UI
-            window.renderJobs();
+            window.renderJobs(); // Will automatically filter based on URL category
         }, (error) => {
             console.error("Error loading jobs:", error);
-            document.getElementById('job-grid').innerHTML = '<div class="col-span-full p-8 text-center text-rose-500">Could not load jobs. Please check database permissions.</div>';
+            document.getElementById('job-grid').innerHTML = '<div class="col-span-full p-8 text-center text-rose-500 bg-rose-50 rounded-xl">Could not load jobs. Please check database permissions.</div>';
         });
 
-        // Initialize Category Sidebar
+        // Initialize UI
         loadCategories();
-
         lucide.createIcons();
     </script>
 </body>
