@@ -16,104 +16,148 @@
             body { background: white; }
             .print-container { box-shadow: none; border: none; padding: 0; margin: 0; max-width: 100%; }
         }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-slate-100 font-sans min-h-screen flex flex-col selection:bg-rose-200 selection:text-rose-900">
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col selection:bg-rose-200 selection:text-rose-900">
 
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm no-print">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
+    <!-- Top Navigation -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-[60] shadow-sm h-16 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+            <div class="flex justify-between items-center h-full">
                 <div class="flex items-center">
                     <a href="index.html" class="flex-shrink-0 flex items-center cursor-pointer group">
-                        <div class="w-10 h-10 bg-rose-600 rounded-lg flex items-center justify-center mr-2 group-hover:bg-rose-700 transition-colors">
+                        <div class="w-10 h-10 bg-rose-600 rounded-lg flex items-center justify-center mr-2 group-hover:bg-rose-700 transition-colors shadow-inner">
                             <i data-lucide="briefcase" class="text-white w-6 h-6"></i>
                         </div>
                         <span class="font-bold text-2xl text-slate-800 tracking-tight">Lanka<span class="text-rose-600">Jobs</span></span>
                     </a>
                 </div>
-                <div class="flex items-center">
-                    <a href="index.html" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-2">
-                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Jobs
-                    </a>
+                
+                <div class="hidden md:flex sm:items-center sm:space-x-4">
+                    <a href="index.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors">Home</a>
+                    <a href="postyourvacancy.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors">Post Your Vacancy</a>
+                    <a href="contactus.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors">Contact Us</a>
+                    <div class="h-6 w-px bg-gray-300 mx-2"></div>
+                    
+                    <!-- Auth Section (Desktop) -->
+                    <div id="auth-section-desktop" class="flex items-center gap-3">
+                        <a href="login.html" class="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium">
+                            <i data-lucide="log-in" class="w-4 h-4 text-slate-500"></i>
+                            Log in / Sign in
+                        </a>
+                    </div>
                 </div>
+
+                <div class="flex items-center md:hidden gap-3">
+                    <a href="index.html" class="px-3 py-1.5 rounded-lg text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-2">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+                    </a>
+                    <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="text-slate-500 hover:text-slate-700 p-2">
+                        <i data-lucide="menu"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-200 p-4 space-y-2 shadow-inner absolute w-full left-0 top-16 z-[60]">
+            <a href="index.html" class="block w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-rose-50">Home</a>
+            <a href="postyourvacancy.html" class="block w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-rose-50">Post Vacancy</a>
+            <a href="contactus.html" class="block w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-rose-50">Contact Us</a>
+            <hr class="my-2">
+            <div id="auth-section-mobile">
+                <a href="login.html" class="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium">
+                    <i data-lucide="log-in" class="w-4 h-4 text-slate-500"></i>
+                    Log in / Sign in
+                </a>
             </div>
         </div>
     </nav>
 
-    <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6 md:py-10 fade-in print-container">
+    <main class="flex-1 w-full max-w-5xl mx-auto px-4 py-6 md:py-10 fade-in print-container">
         
+        <!-- Top Action bar just for back navigation on Desktop -->
+        <div class="hidden md:flex justify-start mb-6 no-print">
+            <a href="javascript:history.back()" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-600 bg-white border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors flex items-center gap-2">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Jobs
+            </a>
+        </div>
+
         <!-- Loading UI -->
-        <div id="loading-state" class="flex flex-col items-center justify-center py-32 no-print">
+        <div id="loading-state" class="flex flex-col items-center justify-center py-32 no-print bg-white rounded-2xl border border-slate-200 shadow-sm">
             <i data-lucide="loader-2" class="w-10 h-10 animate-spin text-rose-600 mb-4"></i>
             <h2 class="text-xl font-bold text-slate-700">Loading Vacancy Details...</h2>
         </div>
 
         <!-- Error UI -->
-        <div id="error-state" class="hidden flex flex-col items-center justify-center py-32 no-print">
+        <div id="error-state" class="hidden flex flex-col items-center justify-center py-32 no-print bg-white rounded-2xl border border-slate-200 shadow-sm">
             <div class="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mb-4">
                 <i data-lucide="alert-circle" class="w-8 h-8 text-rose-600"></i>
             </div>
             <h2 class="text-2xl font-bold text-slate-800 mb-2">Vacancy Not Found</h2>
             <p class="text-slate-500 mb-6">This job might have expired or the link is invalid.</p>
-            <a href="index.html" class="px-6 py-2 bg-rose-600 text-white font-bold rounded-lg hover:bg-rose-700">Browse Jobs</a>
+            <a href="index.html" class="px-6 py-2 bg-rose-600 text-white font-bold rounded-lg hover:bg-rose-700 shadow-md">Browse Jobs</a>
         </div>
 
-        <div id="job-content" class="hidden bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+        <div id="job-content" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             
             <!-- 1. Top Info Bar (Company, Ref, Dates) -->
-            <div class="bg-slate-50 px-6 py-4 border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center flex-shrink-0">
-                        <i data-lucide="building-2" class="w-6 h-6 text-rose-600"></i>
+                    <div class="w-14 h-14 bg-white rounded-xl shadow-sm border border-slate-200 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="building-2" class="w-7 h-7 text-rose-600"></i>
                     </div>
                     <div>
-                        <h2 id="jd-company" class="font-bold text-lg text-slate-800 leading-tight">Company Name</h2>
-                        <p id="jd-location" class="text-sm text-slate-500 flex items-center gap-1">
-                            <i data-lucide="map-pin" class="w-3 h-3"></i> Location
+                        <h2 id="jd-company" class="font-bold text-lg md:text-xl text-slate-800 leading-tight">Company Name</h2>
+                        <p id="jd-location" class="text-sm text-slate-500 flex items-center gap-1.5 mt-1 font-medium">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-slate-400"></i> Location
                         </p>
                     </div>
                 </div>
                 
-                <div class="flex flex-col md:items-end text-sm text-slate-600 bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
-                    <p class="font-medium">Job Ref No: <span id="jd-ref" class="text-slate-800 font-bold">...</span></p>
-                    <p class="font-medium text-rose-600 flex items-center gap-1 mt-0.5">
-                        <i data-lucide="calendar-clock" class="w-4 h-4"></i> Closing Date: <span id="jd-closing">...</span>
+                <div class="flex flex-col md:items-end text-sm text-slate-600 bg-white px-5 py-3 rounded-xl border border-slate-200 shadow-sm w-full md:w-auto">
+                    <p class="font-medium flex justify-between w-full md:w-auto gap-4">Job Ref No: <span id="jd-ref" class="text-slate-800 font-bold uppercase tracking-wider">...</span></p>
+                    <p class="font-medium text-rose-600 flex items-center gap-1.5 mt-1 justify-between w-full md:w-auto">
+                        <span class="flex items-center gap-1.5"><i data-lucide="calendar-clock" class="w-4 h-4"></i> Closing Date:</span> 
+                        <span id="jd-closing" class="font-bold text-rose-700">...</span>
                     </p>
                 </div>
             </div>
 
-            <!-- 2. Action/Nav Bar (Mimicking Topjobs layout but modern) -->
-            <div class="bg-white px-6 py-4 border-b border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-16 z-30 shadow-sm no-print">
+            <!-- 2. Action/Nav Bar (Prominent Job Title & Actions) -->
+            <div class="bg-white px-6 py-5 border-b border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6 sticky top-16 z-30 shadow-sm no-print">
                 
-                <!-- Left: Job Type Badge -->
-                <div class="w-full md:w-1/4 flex justify-start">
-                    <span id="jd-type" class="px-4 py-1.5 bg-rose-50 border border-rose-200 text-rose-700 font-bold text-sm rounded-lg shadow-sm">
+                <!-- Left: Job Type Badge & Title -->
+                <div class="w-full md:w-2/3 flex flex-col items-center md:items-start text-center md:text-left">
+                    <span id="jd-type" class="px-3 py-1 bg-rose-50 border border-rose-100 text-rose-700 font-bold text-xs rounded-lg shadow-sm mb-2 uppercase tracking-wider">
                         Full Time
                     </span>
-                </div>
-
-                <!-- Center: Job Title -->
-                <div class="w-full md:w-2/4 text-center">
-                    <h1 id="jd-title" class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Job Title / Position</h1>
+                    <h1 id="jd-title" class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-tight">Job Title / Position</h1>
                 </div>
 
                 <!-- Right: Actions (Apply & Print) -->
-                <div class="w-full md:w-1/4 flex justify-end gap-2" id="action-buttons-top">
-                    <!-- Buttons dynamically injected via JS based on application method -->
+                <div class="w-full md:w-1/3 flex flex-col md:flex-row justify-center md:justify-end gap-3" id="action-buttons-top">
+                    <!-- Buttons dynamically injected via JS -->
                 </div>
             </div>
 
             <!-- 3. Main Content (Artwork / Summary) -->
-            <div class="p-6 md:p-10 bg-slate-100 flex flex-col items-center justify-center min-h-[400px]">
+            <div class="p-6 md:p-10 bg-slate-50 flex flex-col items-center justify-center min-h-[400px]">
                 
-                <!-- Artwork Image (Primary display if available) -->
-                <div id="artwork-container" class="w-full max-w-4xl bg-white p-2 md:p-4 rounded-xl shadow-md border border-gray-200 mb-8 hidden">
-                    <img id="jd-artwork" src="" alt="Vacancy Advertisement" class="w-full h-auto rounded-lg">
+                <!-- Artwork Image -->
+                <div id="artwork-container" class="w-full max-w-4xl bg-white p-2 rounded-2xl shadow-sm border border-slate-200 mb-8 hidden">
+                    <img id="jd-artwork" src="" alt="Vacancy Advertisement" class="w-full h-auto rounded-xl">
                 </div>
 
-                <!-- Text Summary (Fallback or supplementary text) -->
-                <div class="w-full max-w-4xl bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-200 text-left">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                <!-- Text Summary -->
+                <div class="w-full max-w-4xl bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 text-left">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
                         <i data-lucide="align-left" class="w-5 h-5 text-rose-600"></i> Vacancy Overview
                     </h3>
                     <div id="jd-summary" class="text-slate-700 whitespace-pre-wrap leading-relaxed text-sm md:text-base font-medium">
@@ -123,16 +167,23 @@
 
             </div>
 
-            <!-- 4. Bottom Bar (Repeat Apply Button) -->
-            <div class="bg-white px-6 py-4 border-t border-gray-200 flex justify-center md:justify-end items-center gap-4 bg-slate-50 no-print" id="action-buttons-bottom">
-                <!-- Same buttons as top will be cloned here via JS -->
+            <!-- 4. Bottom Bar (Repeat Actions) -->
+            <div class="bg-white px-6 py-5 border-t border-slate-200 flex flex-col md:flex-row justify-center md:justify-end items-center gap-3 bg-slate-50 no-print" id="action-buttons-bottom">
+                <!-- Apply Buttons injected here -->
             </div>
             
         </div>
     </main>
 
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-6 right-6 z-[80] flex items-center gap-3 text-white px-6 py-4 rounded-xl shadow-2xl transition-all">
+        <i id="toast-icon" data-lucide="check-circle" class="w-6 h-6"></i>
+        <span id="toast-message" class="font-medium text-sm">Message</span>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // Firebase Configuration
@@ -146,11 +197,44 @@
         };
         
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
         
         lucide.createIcons();
 
-        // 1. Get Job ID from URL parameters
+        // --- GLOBAL UI FUNCTIONS ---
+        window.showToast = (message, type = 'success') => {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = message;
+            document.getElementById('toast-icon').setAttribute('data-lucide', type === 'success' ? 'check-circle' : 'alert-circle');
+            toast.className = `fixed bottom-6 right-6 z-[80] flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl fade-in ${type==='success'?'bg-emerald-600':'bg-rose-600'} text-white`;
+            lucide.createIcons();
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        };
+
+        // --- AUTH HANDLING ---
+        window.handleLogout = () => {
+            signOut(auth).then(() => {
+                window.showToast("Logged out.", "success");
+            });
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const navHtml = `<a href="login.html" class="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors shadow-sm font-medium"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</a>
+                                 <button onclick="window.handleLogout()" class="text-slate-400 hover:text-rose-600 ml-2" title="Logout"><i data-lucide="log-out" class="w-5 h-5"></i></button>`;
+                document.getElementById('auth-section-desktop').innerHTML = navHtml;
+                document.getElementById('auth-section-mobile').innerHTML = navHtml.replace('px-4 py-2', 'w-full px-4 py-2 justify-center');
+            } else {
+                const loginBtnHtml = `<a href="login.html" class="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium"><i data-lucide="log-in" class="w-4 h-4 text-slate-500"></i> Log in / Sign in</a>`;
+                document.getElementById('auth-section-desktop').innerHTML = loginBtnHtml;
+                document.getElementById('auth-section-mobile').innerHTML = loginBtnHtml.replace('px-4 py-2', 'w-full px-4 py-2 justify-center');
+            }
+            lucide.createIcons();
+        });
+
+        // --- JOB RENDERING LOGIC ---
         const urlParams = new URLSearchParams(window.location.search);
         const jobId = urlParams.get('id');
 
@@ -161,10 +245,10 @@
             }
 
             try {
-                // Fetching from 'vacancies' collection
                 const docRef = doc(db, "vacancies", jobId);
                 const docSnap = await getDoc(docRef);
 
+                // Ensure job exists and is meant to be visible (active)
                 if (docSnap.exists() && (docSnap.data().status === 'active' || docSnap.data().status === 'approved')) {
                     const job = docSnap.data();
                     renderJob(job, docSnap.id);
@@ -178,25 +262,29 @@
         }
 
         function renderJob(job, id) {
-            // Hide loading, show content
+            // Display main container
             document.getElementById('loading-state').classList.add('hidden');
             document.getElementById('job-content').classList.remove('hidden');
 
             // Header Section
             document.getElementById('jd-company').innerText = job.companyName || job.company || "Company Confidential";
-            document.getElementById('jd-location').innerHTML = `<i data-lucide="map-pin" class="w-4 h-4"></i> ${job.district || ''}, ${job.country || 'Sri Lanka'}`;
+            document.getElementById('jd-location').innerHTML = `<i data-lucide="map-pin" class="w-4 h-4 text-slate-400"></i> ${job.district || ''}${job.country ? ', ' + job.country : ''}`;
             
-            // Generate a short Ref ID from the Firebase document ID (first 7 chars)
-            document.getElementById('jd-ref').innerText = id.substring(0, 7).toUpperCase();
+            // Reference Number
+            document.getElementById('jd-ref').innerText = id.substring(0, 7);
             
-            // Calculate Closing Date (Assuming 14 days from creation date as per topAd package)
-            if (job.createdAt) {
+            // Smart Expiry Date Logic
+            let closingDate = 'Not Specified';
+            if(job.expiresAt) {
+                // If admin explicitly set an expiry timestamp
+                closingDate = new Date(job.expiresAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            } else if (job.createdAt) {
+                // Fallback to 14 days after creation
                 const createdDate = new Date(job.createdAt);
                 createdDate.setDate(createdDate.getDate() + 14); 
-                document.getElementById('jd-closing').innerText = createdDate.toLocaleDateString('en-GB');
-            } else {
-                document.getElementById('jd-closing').innerText = "Not Specified";
+                closingDate = createdDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
             }
+            document.getElementById('jd-closing').innerText = closingDate;
 
             // Nav Bar Section
             document.getElementById('jd-type').innerText = job.jobType || "Full Time";
@@ -210,47 +298,65 @@
                 document.getElementById('jd-artwork').src = job.artworkUrl;
             }
 
-            // Application Buttons Logic (Dynamic based on Admin selection)
-            let applyButtonHtml = '';
+            // --- APPLICATION BUTTONS LOGIC ---
+            let applyButtons = [];
             
+            // 1. Primary Method (Email, Link, or Walk-in)
             if (job.applicationMethod === 'Via Email' && job.destinationEmail) {
-                const subject = encodeURIComponent(`Job Application: ${job.position} (Ref: ${id.substring(0,7).toUpperCase()})`);
-                applyButtonHtml = `
-                    <a href="mailto:${job.destinationEmail}?subject=${subject}" class="inline-flex items-center gap-2 px-6 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 shadow-sm transition-colors text-sm">
-                        <i data-lucide="mail" class="w-4 h-4"></i> Apply by email
+                const subject = encodeURIComponent(`Job Application: ${job.position || job.title} (Ref: ${id.substring(0,7).toUpperCase()})`);
+                applyButtons.push(`
+                    <a href="mailto:${job.destinationEmail}?subject=${subject}" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-rose-600 text-white font-bold rounded-xl hover:bg-rose-700 shadow-md transition-all text-sm w-full md:w-auto">
+                        <i data-lucide="mail" class="w-4 h-4"></i> Apply via Email
                     </a>
-                `;
+                `);
             } 
             else if (job.applicationMethod === 'Via Link' && job.applicationLink) {
-                applyButtonHtml = `
-                    <a href="${job.applicationLink}" target="_blank" class="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-sm transition-colors text-sm">
-                        <i data-lucide="external-link" class="w-4 h-4"></i> Apply via Website
+                let href = job.applicationLink;
+                if (!href.startsWith('http://') && !href.startsWith('https://')) href = 'https://' + href;
+                
+                applyButtons.push(`
+                    <a href="${href}" target="_blank" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-md transition-all text-sm w-full md:w-auto">
+                        <i data-lucide="external-link" class="w-4 h-4"></i> Apply on Website
                     </a>
-                `;
+                `);
             }
             else if (job.applicationMethod === 'Walk-in') {
-                applyButtonHtml = `
-                    <button class="inline-flex items-center gap-2 px-6 py-2 bg-amber-600 text-white font-bold rounded-lg cursor-default shadow-sm text-sm">
+                applyButtons.push(`
+                    <button class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-600 text-white font-bold rounded-xl cursor-default shadow-md text-sm w-full md:w-auto">
                         <i data-lucide="footprints" class="w-4 h-4"></i> Walk-in Interviews
                     </button>
-                `;
+                `);
             }
+
+            // 2. Secondary Method (WhatsApp if available)
+            if (job.whatsappNumber) {
+                const cleanWa = job.whatsappNumber.replace(/[^0-9+]/g, '');
+                const message = encodeURIComponent(`Hi, I'm inquiring about the ${job.position || job.title} vacancy (Ref: ${id.substring(0,7).toUpperCase()}).`);
+                applyButtons.push(`
+                    <a href="https://wa.me/${cleanWa}?text=${message}" target="_blank" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#25D366] text-white font-bold rounded-xl hover:bg-[#128C7E] shadow-md transition-all text-sm w-full md:w-auto">
+                        <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
+                    </a>
+                `);
+            }
+
+            const buttonsHtml = applyButtons.join('');
 
             // Print Button
             const printButtonHtml = `
-                <button onclick="window.print()" class="inline-flex items-center gap-2 px-4 py-2 bg-rose-700 text-white font-bold rounded-lg hover:bg-rose-800 shadow-sm transition-colors text-sm">
+                <button onclick="window.print()" class="inline-flex items-center justify-center gap-2 px-4 py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-900 shadow-sm transition-all text-sm w-full md:w-auto">
                     <i data-lucide="printer" class="w-4 h-4"></i> Print
                 </button>
             `;
 
-            // Inject buttons to top and bottom bars
-            document.getElementById('action-buttons-top').innerHTML = applyButtonHtml + printButtonHtml;
-            
-            // Only inject Apply button to bottom bar (printing from bottom is rare)
-            document.getElementById('action-buttons-bottom').innerHTML = applyButtonHtml;
+            // Inject buttons into the UI
+            document.getElementById('action-buttons-top').innerHTML = buttonsHtml + printButtonHtml;
+            document.getElementById('action-buttons-bottom').innerHTML = buttonsHtml;
 
-            // Re-initialize icons for dynamically added elements
+            // Render newly injected icons
             lucide.createIcons();
+            
+            // Set Page Title
+            document.title = `${job.position || job.title} at ${job.companyName || job.company} - LankaJobs`;
         }
 
         function showError() {
@@ -258,7 +364,7 @@
             document.getElementById('error-state').classList.remove('hidden');
         }
 
-        // Start execution
+        // Run
         fetchJobDetails();
 
     </script>
