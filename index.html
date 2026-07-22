@@ -164,98 +164,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- ================= DASHBOARD VIEW ================= -->
-        <div id="view-dashboard" class="hidden-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 fade-in w-full flex-1">
-            <div class="flex flex-col md:flex-row gap-6 h-full">
-                <!-- Left Sidebar for Dashboard -->
-                <div class="w-full md:w-64 bg-slate-900 rounded-2xl p-6 text-white shadow-xl flex flex-col flex-shrink-0">
-                    <div class="flex flex-col items-center mb-8">
-                        <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-3 border-2 border-white/20 overflow-hidden">
-                            <i id="dash-avatar" data-lucide="user" class="w-10 h-10 text-slate-200"></i>
-                            <img id="dash-avatar-img" class="w-full h-full object-cover hidden" src="" alt="Avatar">
-                        </div>
-                        <h3 class="font-bold text-lg text-center leading-tight" id="dash-name">Loading...</h3>
-                        <p class="text-slate-400 text-xs text-center break-all mt-1" id="dash-email">...</p>
-                    </div>
-
-                    <nav class="space-y-2 flex-1">
-                        <button onclick="window.switchDashTab('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-rose-600 text-white font-medium transition-colors">
-                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
-                        </button>
-                        <button onclick="window.switchDashTab('profile')" id="nav-profile" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition-colors">
-                            <i data-lucide="file-signature" class="w-5 h-5"></i> Personal Details
-                        </button>
-                    </nav>
-                </div>
-
-                <!-- Main Content Area -->
-                <div class="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden flex flex-col">
-                    
-                    <!-- TAB: Overview -->
-                    <div id="tab-overview" class="fade-in space-y-6">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            
-                            <!-- Profile Completeness Card -->
-                            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col items-center justify-center">
-                                <h3 class="font-bold text-slate-700 mb-6 flex items-center gap-2 w-full"><i data-lucide="pie-chart" class="w-5 h-5 text-rose-500"></i> Profile Completeness</h3>
-                                <div class="circular-progress shadow-inner" id="progress-circle">
-                                    <span class="progress-value" id="progress-text">0%</span>
-                                </div>
-                                <p class="text-sm text-slate-500 mt-6 text-center">Complete sections to improve your profile score. <a href="#" onclick="window.switchDashTab('profile')" class="text-rose-600 hover:underline font-medium">Click Here</a></p>
-                            </div>
-
-                            <!-- Document Upload Card -->
-                            <div class="rounded-2xl border border-emerald-200 shadow-sm overflow-hidden flex flex-col">
-                                <div class="bg-emerald-600 text-white p-3 px-5 font-bold flex items-center gap-2">
-                                    <i data-lucide="upload-cloud" class="w-5 h-5"></i> CV Upload
-                                </div>
-                                <div class="p-6 bg-emerald-50/30 flex-1 flex flex-col justify-center items-center relative">
-                                    <label id="cv-upload-prompt" class="flex flex-col items-center justify-center w-full h-40 border-2 border-emerald-300 border-dashed rounded-xl cursor-pointer bg-white hover:bg-emerald-50 transition-colors">
-                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                            <i data-lucide="file-up" class="w-10 h-10 mb-3 text-emerald-500"></i>
-                                            <p class="mb-1 text-sm text-emerald-700 font-semibold">Upload your CV here</p>
-                                        </div>
-                                        <input type="file" id="cv-file-input" class="hidden" accept=".pdf, .doc, .docx" />
-                                    </label>
-                                    
-                                    <div id="cv-upload-action" class="hidden w-full flex flex-col items-center justify-center bg-white p-6 rounded-xl border border-emerald-200 shadow-sm">
-                                        <i data-lucide="file-text" class="w-12 h-12 text-emerald-600 mb-2"></i>
-                                        <p id="cv-preview-name" class="font-medium text-slate-700 text-center truncate w-full px-4 mb-4">document.pdf</p>
-                                        <div class="flex gap-3 w-full">
-                                            <button onclick="window.cancelCVUpload()" class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 font-medium text-sm transition-colors">Cancel</button>
-                                            <button onclick="window.uploadCV()" id="cv-upload-btn" class="flex-1 px-4 py-2 bg-emerald-600 rounded-lg text-white hover:bg-emerald-700 font-medium text-sm transition-colors flex justify-center items-center gap-2">
-                                                <i data-lucide="upload" class="w-4 h-4"></i> Upload Now
-                                            </button>
-                                        </div>
-                                    </div>
-                                    
-                                    <div id="cv-upload-success" class="hidden w-full flex flex-col items-center justify-center bg-white p-6 rounded-xl border border-emerald-200 shadow-sm">
-                                        <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-2">
-                                            <i data-lucide="check" class="w-6 h-6 text-emerald-600"></i>
-                                        </div>
-                                        <p class="font-bold text-emerald-700 mb-1">CV Saved Successfully</p>
-                                        <button onclick="window.resetCVUpload()" class="mt-4 text-xs text-slate-400 hover:text-slate-600 underline">Upload a different file</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- TAB: Profile Setup -->
-                    <div id="tab-profile" class="hidden-view fade-in flex-1 overflow-y-auto pr-2">
-                        <div class="bg-rose-700 text-white px-5 py-3 rounded-t-xl font-bold flex items-center justify-between">
-                            <span>Personal Details</span>
-                        </div>
-                        <div class="border border-t-0 border-gray-200 rounded-b-xl p-6 bg-slate-50 shadow-inner">
-                            <form id="profile-form" onsubmit="window.saveProfile(event)" class="space-y-6">
-                                <p class="text-slate-500 italic">Candidate profile fields go here...</p>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </main>
 
     <!-- Toast Notification -->
@@ -301,13 +209,6 @@
             setTimeout(() => toast.classList.add('hidden'), 3000);
         };
 
-        window.switchMainView = (viewId) => {
-            window.currentView = viewId;
-            document.getElementById('view-home').classList.add('hidden-view');
-            document.getElementById('view-dashboard').classList.add('hidden-view');
-            document.getElementById('view-' + viewId).classList.remove('hidden-view');
-        };
-
         // --- AUTH LOGIC (Google Sign-In) ---
         window.googleSignIn = async () => {
             const provider = new GoogleAuthProvider();
@@ -335,16 +236,20 @@
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
-                const navHtml = `<button onclick="window.switchMainView('dashboard')" class="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors shadow-sm font-medium"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</button>
+                const navHtml = `<a href="login.html" class="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors shadow-sm font-medium"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</a>
                                  <button onclick="window.handleLogout()" class="text-slate-400 hover:text-rose-600 ml-2" title="Logout"><i data-lucide="log-out" class="w-5 h-5"></i></button>`;
                 document.getElementById('auth-section-desktop').innerHTML = navHtml;
                 document.getElementById('auth-section-mobile').innerHTML = navHtml.replace('px-4 py-2', 'w-full px-4 py-2 justify-center');
-                window.switchMainView('dashboard');
+                
+                // Ensure home view stays visible
+                document.getElementById('view-home').classList.remove('hidden-view');
             } else {
                 const loginBtnHtml = `<a href="login.html" class="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium"><i data-lucide="log-in" class="w-4 h-4 text-slate-500"></i> Log in / Sign in</a>`;
                 document.getElementById('auth-section-desktop').innerHTML = loginBtnHtml;
                 document.getElementById('auth-section-mobile').innerHTML = loginBtnHtml.replace('px-4 py-2', 'w-full px-4 py-2 justify-center');
-                window.switchMainView('home');
+                
+                // Ensure home view stays visible
+                document.getElementById('view-home').classList.remove('hidden-view');
             }
             lucide.createIcons();
         });
