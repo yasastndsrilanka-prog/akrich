@@ -26,7 +26,7 @@
 </head>
 <body class="bg-slate-50 font-sans min-h-screen flex flex-col selection:bg-rose-200 selection:text-rose-900">
 
-    <!-- Top Navigation -->
+    <!-- Top Navigation (Static) -->
     <nav class="bg-white border-b border-gray-200 sticky top-0 z-[60] shadow-sm h-16 no-print">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
             <div class="flex justify-between items-center h-full">
@@ -45,8 +45,8 @@
                     <a href="contactus.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors">Contact Us</a>
                     <div class="h-6 w-px bg-gray-300 mx-2"></div>
                     
-                    <!-- Auth Section (Desktop) -->
-                    <div id="auth-section-desktop" class="flex items-center gap-3">
+                    <!-- Static Login Button -->
+                    <div class="flex items-center gap-3">
                         <a href="login.html" class="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium">
                             <i data-lucide="log-in" class="w-4 h-4 text-slate-500"></i>
                             Log in / Sign in
@@ -71,7 +71,7 @@
             <a href="postyourvacancy.html" class="block w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-rose-50">Post Vacancy</a>
             <a href="contactus.html" class="block w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-rose-50">Contact Us</a>
             <hr class="my-2">
-            <div id="auth-section-mobile">
+            <div>
                 <a href="login.html" class="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium">
                     <i data-lucide="log-in" class="w-4 h-4 text-slate-500"></i>
                     Log in / Sign in
@@ -175,15 +175,8 @@
         </div>
     </main>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="hidden fixed bottom-6 right-6 z-[80] flex items-center gap-3 text-white px-6 py-4 rounded-xl shadow-2xl transition-all">
-        <i id="toast-icon" data-lucide="check-circle" class="w-6 h-6"></i>
-        <span id="toast-message" class="font-medium text-sm">Message</span>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // Firebase Configuration
@@ -197,42 +190,9 @@
         };
         
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
         
         lucide.createIcons();
-
-        // --- GLOBAL UI FUNCTIONS ---
-        window.showToast = (message, type = 'success') => {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-message').innerText = message;
-            document.getElementById('toast-icon').setAttribute('data-lucide', type === 'success' ? 'check-circle' : 'alert-circle');
-            toast.className = `fixed bottom-6 right-6 z-[80] flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl fade-in ${type==='success'?'bg-emerald-600':'bg-rose-600'} text-white`;
-            lucide.createIcons();
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3000);
-        };
-
-        // --- AUTH HANDLING ---
-        window.handleLogout = () => {
-            signOut(auth).then(() => {
-                window.showToast("Logged out.", "success");
-            });
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const navHtml = `<a href="login.html" class="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors shadow-sm font-medium"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</a>
-                                 <button onclick="window.handleLogout()" class="text-slate-400 hover:text-rose-600 ml-2" title="Logout"><i data-lucide="log-out" class="w-5 h-5"></i></button>`;
-                document.getElementById('auth-section-desktop').innerHTML = navHtml;
-                document.getElementById('auth-section-mobile').innerHTML = navHtml.replace('px-4 py-2', 'w-full px-4 py-2 justify-center');
-            } else {
-                const loginBtnHtml = `<a href="login.html" class="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium"><i data-lucide="log-in" class="w-4 h-4 text-slate-500"></i> Log in / Sign in</a>`;
-                document.getElementById('auth-section-desktop').innerHTML = loginBtnHtml;
-                document.getElementById('auth-section-mobile').innerHTML = loginBtnHtml.replace('px-4 py-2', 'w-full px-4 py-2 justify-center');
-            }
-            lucide.createIcons();
-        });
 
         // --- JOB RENDERING LOGIC ---
         const urlParams = new URLSearchParams(window.location.search);
@@ -273,13 +233,12 @@
             // Reference Number
             document.getElementById('jd-ref').innerText = id.substring(0, 7);
             
-            // Smart Expiry Date Logic
+            // Smart Expiry Date Logic (Reads from admin's expiresAt)
             let closingDate = 'Not Specified';
             if(job.expiresAt) {
-                // If admin explicitly set an expiry timestamp
                 closingDate = new Date(job.expiresAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
             } else if (job.createdAt) {
-                // Fallback to 14 days after creation
+                // Fallback to 14 days after creation if not specified
                 const createdDate = new Date(job.createdAt);
                 createdDate.setDate(createdDate.getDate() + 14); 
                 closingDate = createdDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -302,38 +261,41 @@
             let applyButtons = [];
             
             // 1. Primary Method (Email, Link, or Walk-in)
-            if (job.applicationMethod === 'Via Email' && job.destinationEmail) {
-                const subject = encodeURIComponent(`Job Application: ${job.position || job.title} (Ref: ${id.substring(0,7).toUpperCase()})`);
-                applyButtons.push(`
-                    <a href="mailto:${job.destinationEmail}?subject=${subject}" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-rose-600 text-white font-bold rounded-xl hover:bg-rose-700 shadow-md transition-all text-sm w-full md:w-auto">
-                        <i data-lucide="mail" class="w-4 h-4"></i> Apply via Email
-                    </a>
-                `);
-            } 
-            else if (job.applicationMethod === 'Via Link' && job.applicationLink) {
+            // Name is strictly "Apply" as requested.
+            if (job.applicationMethod === 'Via Link' && job.applicationLink) {
                 let href = job.applicationLink;
                 if (!href.startsWith('http://') && !href.startsWith('https://')) href = 'https://' + href;
                 
                 applyButtons.push(`
-                    <a href="${href}" target="_blank" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-md transition-all text-sm w-full md:w-auto">
-                        <i data-lucide="external-link" class="w-4 h-4"></i> Apply on Website
+                    <a href="${href}" target="_blank" class="inline-flex items-center justify-center gap-2 px-8 py-3 bg-rose-600 text-white font-bold rounded-xl hover:bg-rose-700 shadow-md transition-all text-sm w-full md:w-auto">
+                        <i data-lucide="external-link" class="w-4 h-4"></i> Apply
                     </a>
                 `);
             }
+            else if (job.applicationMethod === 'Via Email' && job.destinationEmail) {
+                const subject = encodeURIComponent(`Job Application: ${job.position || job.title} (Ref: ${id.substring(0,7).toUpperCase()})`);
+                
+                applyButtons.push(`
+                    <a href="mailto:${job.destinationEmail}?subject=${subject}" class="inline-flex items-center justify-center gap-2 px-8 py-3 bg-rose-600 text-white font-bold rounded-xl hover:bg-rose-700 shadow-md transition-all text-sm w-full md:w-auto">
+                        <i data-lucide="send" class="w-4 h-4"></i> Apply
+                    </a>
+                `);
+            } 
             else if (job.applicationMethod === 'Walk-in') {
                 applyButtons.push(`
-                    <button class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-600 text-white font-bold rounded-xl cursor-default shadow-md text-sm w-full md:w-auto">
+                    <button class="inline-flex items-center justify-center gap-2 px-8 py-3 bg-amber-600 text-white font-bold rounded-xl cursor-default shadow-md text-sm w-full md:w-auto">
                         <i data-lucide="footprints" class="w-4 h-4"></i> Walk-in Interviews
                     </button>
                 `);
             }
 
-            // 2. Secondary Method (WhatsApp if available)
+            // 2. Secondary Method (WhatsApp if Admin provided a WhatsApp Number)
             if (job.whatsappNumber) {
                 const cleanWa = job.whatsappNumber.replace(/[^0-9+]/g, '');
                 const message = encodeURIComponent(`Hi, I'm inquiring about the ${job.position || job.title} vacancy (Ref: ${id.substring(0,7).toUpperCase()}).`);
+                
                 applyButtons.push(`
-                    <a href="https://wa.me/${cleanWa}?text=${message}" target="_blank" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#25D366] text-white font-bold rounded-xl hover:bg-[#128C7E] shadow-md transition-all text-sm w-full md:w-auto">
+                    <a href="https://wa.me/${cleanWa}?text=${message}" target="_blank" class="inline-flex items-center justify-center gap-2 px-8 py-3 bg-[#25D366] text-white font-bold rounded-xl hover:bg-[#128C7E] shadow-md transition-all text-sm w-full md:w-auto">
                         <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
                     </a>
                 `);
@@ -341,7 +303,7 @@
 
             const buttonsHtml = applyButtons.join('');
 
-            // Print Button
+            // Print Button (Only appears at the top)
             const printButtonHtml = `
                 <button onclick="window.print()" class="inline-flex items-center justify-center gap-2 px-4 py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-900 shadow-sm transition-all text-sm w-full md:w-auto">
                     <i data-lucide="printer" class="w-4 h-4"></i> Print
